@@ -73,7 +73,7 @@ build()
     set -e
     cd "$SCRIPTDIR/Build"
     make
-    if [ -e "$BUNDLE" ]; then
+    if [ $? -eq 0 ]; then
         echo "Build success -- Artifacts at $SCRIPTDIR/Build"
     else
         echo "Build failed!"
