@@ -232,21 +232,21 @@ static void TestDataBufferReadWriteInt16()
     ASSERT_ARE_EQUAL( bigEndianBuf.ReadInt16(), bigExpected2 );
     ASSERT_ARE_EQUAL( littleEndianBuf.ReadInt16(), littleExpected1 );
     ASSERT_ARE_EQUAL( littleEndianBuf.ReadInt16(), littleExpected2 );
-    DataBuffer buf;
-    ASSERT_TRUE( buf.Empty() );
-    ASSERT_ARE_EQUAL( buf.Size(), 0 );
-    buf.WriteInt16( INT16_C( 0x00ff ) );
-    ASSERT_FALSE( buf.Empty() );
-    ASSERT_ARE_EQUAL( buf.Size(), 2 );
-    buf.WriteInt16( INT16_C( 0x7f00 ) );
-    ASSERT_FALSE( buf.Empty() );
-    ASSERT_ARE_EQUAL( buf.Size(), 4 );
-    ASSERT_ARE_EQUAL( buf.ReadInt16(), INT16_C( 0x00ff ) );
-    ASSERT_FALSE( buf.Empty() );
-    ASSERT_ARE_EQUAL( buf.Size(), 2 );
-    ASSERT_ARE_EQUAL( buf.ReadInt16(), INT16_C( 0x7f00 ) );
-    ASSERT_TRUE( buf.Empty() );
-    ASSERT_ARE_EQUAL( buf.Size(), 0 );
+    DataBuffer bigEndianBuf2;
+    ASSERT_TRUE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 0 );
+    bigEndianBuf2.WriteInt16( INT16_C( 0x00ff ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 2 );
+    bigEndianBuf2.WriteInt16( INT16_C( 0x7f00 ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 4 );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.ReadInt16(), INT16_C( 0x00ff ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 2 );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.ReadInt16(), INT16_C( 0x7f00 ) );
+    ASSERT_TRUE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 0 );
     DataBuffer littleEndianBuf2( DataBuffer::LittleEndian );
     ASSERT_TRUE( littleEndianBuf2.Empty() );
     ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 0 );
@@ -280,21 +280,21 @@ static void TestDataBufferReadWriteUInt16()
     ASSERT_ARE_EQUAL( bigEndianBuf.ReadUInt16(), bigExpected2 );
     ASSERT_ARE_EQUAL( littleEndianBuf.ReadUInt16(), littleExpected1 );
     ASSERT_ARE_EQUAL( littleEndianBuf.ReadUInt16(), littleExpected2 );
-    DataBuffer buf;
-    ASSERT_TRUE( buf.Empty() );
-    ASSERT_ARE_EQUAL( buf.Size(), 0 );
-    buf.WriteUInt16( UINT16_C( 0x00ff ) );
-    ASSERT_FALSE( buf.Empty() );
-    ASSERT_ARE_EQUAL( buf.Size(), 2 );
-    buf.WriteUInt16( UINT16_C( 0xff00 ) );
-    ASSERT_FALSE( buf.Empty() );
-    ASSERT_ARE_EQUAL( buf.Size(), 4 );
-    ASSERT_ARE_EQUAL( buf.ReadUInt16(), UINT16_C( 0x00ff ) );
-    ASSERT_FALSE( buf.Empty() );
-    ASSERT_ARE_EQUAL( buf.Size(), 2 );
-    ASSERT_ARE_EQUAL( buf.ReadUInt16(), UINT16_C( 0xff00 ) );
-    ASSERT_TRUE( buf.Empty() );
-    ASSERT_ARE_EQUAL( buf.Size(), 0 );
+    DataBuffer bigEndianBuf2;
+    ASSERT_TRUE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 0 );
+    bigEndianBuf2.WriteUInt16( UINT16_C( 0x00ff ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 2 );
+    bigEndianBuf2.WriteUInt16( UINT16_C( 0xff00 ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 4 );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.ReadUInt16(), UINT16_C( 0x00ff ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 2 );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.ReadUInt16(), UINT16_C( 0xff00 ) );
+    ASSERT_TRUE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 0 );
     DataBuffer littleEndianBuf2( DataBuffer::LittleEndian );
     ASSERT_TRUE( littleEndianBuf2.Empty() );
     ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 0 );
@@ -315,13 +315,97 @@ static void TestDataBufferReadWriteUInt16()
 static void TestDataBufferReadWriteInt32()
 {
 #if defined( _INT32_T )
-    throw NotImplementedException();
+    unsigned char data[] = { 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x01, 0x00 };
+    DataBuffer bigEndianBuf;
+    DataBuffer littleEndianBuf( DataBuffer::LittleEndian );
+    bigEndianBuf.WriteUCharArray( data, 8, false );
+    littleEndianBuf.WriteUCharArray( data, 8, false );
+    int32_t bigExpected1 = 65537;
+    int32_t bigExpected2 = 16777472;
+    int32_t littleExpected1 = 16777472;
+    int32_t littleExpected2 = 65537;
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadInt32(), bigExpected1 );
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadInt32(), bigExpected2 );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadInt32(), littleExpected1 );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadInt32(), littleExpected2 );
+    DataBuffer bigEndianBuf2;
+    ASSERT_TRUE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 0 );
+    bigEndianBuf2.WriteInt32( INT32_C( 0x00ff00ff ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 4 );
+    bigEndianBuf2.WriteInt32( INT32_C( 0x7f00ff00 ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 8 );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.ReadInt32(), INT32_C( 0x00ff00ff ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 4 );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.ReadInt32(), INT32_C( 0x7f00ff00 ) );
+    ASSERT_TRUE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 0 );
+    DataBuffer littleEndianBuf2( DataBuffer::LittleEndian );
+    ASSERT_TRUE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 0 );
+    littleEndianBuf2.WriteInt32( INT32_C( 0x00ff00ff ) );
+    ASSERT_FALSE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 4 );
+    littleEndianBuf2.WriteInt32( INT32_C( 0x7f00ff00 ) );
+    ASSERT_FALSE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 8 );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.ReadInt32(), INT32_C( 0x00ff00ff ) );
+    ASSERT_FALSE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 4 );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.ReadInt32(), INT32_C( 0x7f00ff00 ) );
+    ASSERT_TRUE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 0 );
 #endif
 }
 static void TestDataBufferReadWriteUInt32()
 {
 #if defined( _UINT32_T )
-    throw NotImplementedException();
+    unsigned char data[] = { 0x00, 0xff, 0x00, 0xff, 0xff, 0x00, 0xff, 0x00 };
+    DataBuffer bigEndianBuf;
+    DataBuffer littleEndianBuf( DataBuffer::LittleEndian );
+    bigEndianBuf.WriteUCharArray( data, 8, false );
+    littleEndianBuf.WriteUCharArray( data, 8, false );
+    uint32_t bigExpected1 = 16711935;
+    uint32_t bigExpected2 = 4278255360;
+    uint32_t littleExpected1 = 4278255360;
+    uint32_t littleExpected2 = 16711935;
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadUInt32(), bigExpected1 );
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadUInt32(), bigExpected2 );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadUInt32(), littleExpected1 );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadUInt32(), littleExpected2 );
+    DataBuffer bigEndianBuf2;
+    ASSERT_TRUE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 0 );
+    bigEndianBuf2.WriteInt32( UINT32_C( 0x00ff00ff ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 4 );
+    bigEndianBuf2.WriteInt32( UINT32_C( 0xff00ff00 ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 8 );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.ReadUInt32(), UINT32_C( 0x00ff00ff ) );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 4 );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.ReadUInt32(), UINT32_C( 0xff00ff00 ) );
+    ASSERT_TRUE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 0 );
+    DataBuffer littleEndianBuf2( DataBuffer::LittleEndian );
+    ASSERT_TRUE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 0 );
+    littleEndianBuf2.WriteUInt32( UINT32_C( 0x00ff00ff ) );
+    ASSERT_FALSE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 4 );
+    littleEndianBuf2.WriteUInt32( UINT32_C( 0xff00ff00 ) );
+    ASSERT_FALSE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 8 );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.ReadUInt32(), UINT32_C( 0x00ff00ff ) );
+    ASSERT_FALSE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 4 );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.ReadUInt32(), UINT32_C( 0xff00ff00 ) );
+    ASSERT_TRUE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 0 );
 #endif
 }
 static void TestDataBufferReadWriteInt64()
@@ -436,23 +520,161 @@ static void TestDataBufferReadWriteShort()
 }
 static void TestDataBufferReadWriteUShort()
 {
-    throw NotImplementedException();
+    unsigned char data[] = { 0x00, 0xff, 0xff, 0x00 };
+    DataBuffer bigEndianBuf;
+    DataBuffer littleEndianBuf( DataBuffer::LittleEndian );
+    bigEndianBuf.WriteUCharArray( data, 4, false );
+    littleEndianBuf.WriteUCharArray( data, 4, false );
+    unsigned short bigExpected1 = 255;
+    unsigned short bigExpected2 = 65280;
+    unsigned short littleExpected1 = 65280;
+    unsigned short littleExpected2 = 255;
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadUShort(), bigExpected1 );
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadUShort(), bigExpected2 );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadUShort(), littleExpected1 );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadUShort(), littleExpected2 );
+    DataBuffer bigEndianBuf2;
+    ASSERT_TRUE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 0 );
+    bigEndianBuf2.WriteUShort( 0x00ff );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 2 );
+    bigEndianBuf2.WriteUShort( 0xff00 );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 4 );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.ReadUShort(), 0x00ff );
+    ASSERT_FALSE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 2 );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.ReadUShort(), 0xff00 );
+    ASSERT_TRUE( bigEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf2.Size(), 0 );
+    DataBuffer littleEndianBuf2( DataBuffer::LittleEndian );
+    ASSERT_TRUE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 0 );
+    littleEndianBuf2.WriteUShort( 0x00ff );
+    ASSERT_FALSE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 2 );
+    littleEndianBuf2.WriteUShort( 0xff00 );
+    ASSERT_FALSE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 4 );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.ReadUShort(), 0x00ff );
+    ASSERT_FALSE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 2 );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.ReadUShort(), 0xff00 );
+    ASSERT_TRUE( littleEndianBuf2.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 0 );
 }
 static void TestDataBufferReadWriteInt()
 {
-    throw NotImplementedException();
+    // some tests with previous data types are not possible because the size of an int is uncertain
+    DataBuffer bigEndianBuf;
+    DataBuffer littleEndianBuf( DataBuffer::LittleEndian );
+    int expected1 = 12345;
+    int expected2 = -4321;
+    ASSERT_TRUE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), 0 );
+    bigEndianBuf.WriteInt( expected1 );
+    ASSERT_FALSE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), sizeof( int ) );
+    bigEndianBuf.WriteInt( expected2 );
+    ASSERT_FALSE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), sizeof( int ) * 2 );
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadInt(), expected1 );
+    ASSERT_FALSE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), sizeof( int ) );
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadInt(), expected2 );
+    ASSERT_TRUE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), 0 );
+    ASSERT_TRUE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), 0 );
+    littleEndianBuf.WriteInt( expected1 );
+    ASSERT_FALSE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), sizeof( int ) );
+    littleEndianBuf.WriteInt( expected2 );
+    ASSERT_FALSE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), sizeof( int ) * 2 );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadInt(), expected1 );
+    ASSERT_FALSE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), sizeof( int ) );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadInt(), expected2 );
+    ASSERT_TRUE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), 0 );
 }
 static void TestDataBufferReadWriteUInt()
 {
-    throw NotImplementedException();
+    // some tests with previous data types are not possible because the size of an unsigned int is uncertain
+    DataBuffer bigEndianBuf;
+    DataBuffer littleEndianBuf( DataBuffer::LittleEndian );
+    unsigned int expected1 = 12345;
+    unsigned int expected2 = 54321;
+    ASSERT_TRUE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), 0 );
+    bigEndianBuf.WriteUInt( expected1 );
+    ASSERT_FALSE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), sizeof( unsigned int ) );
+    bigEndianBuf.WriteUInt( expected2 );
+    ASSERT_FALSE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), sizeof( unsigned int ) * 2 );
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadUInt(), expected1 );
+    ASSERT_FALSE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), sizeof( unsigned int ) );
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadUInt(), expected2 );
+    ASSERT_TRUE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), 0 );
+    ASSERT_TRUE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), 0 );
+    littleEndianBuf.WriteUInt( expected1 );
+    ASSERT_FALSE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), sizeof( unsigned int ) );
+    littleEndianBuf.WriteUInt( expected2 );
+    ASSERT_FALSE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), sizeof( unsigned int ) * 2 );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadUInt(), expected1 );
+    ASSERT_FALSE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), sizeof( unsigned int ) );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadUInt(), expected2 );
+    ASSERT_TRUE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), 0 );
 }
 static void TestDataBufferReadWriteLong()
 {
-    throw NotImplementedException();
+    // some tests with previous data types are not possible because the size of a long is uncertain
+    DataBuffer bigEndianBuf;
+    DataBuffer littleEndianBuf( DataBuffer::LittleEndian );
+    long expected1 = 123456789;
+    long expected2 = -987654321;
+    ASSERT_TRUE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), 0 );
+    bigEndianBuf.WriteLong( expected1 );
+    ASSERT_FALSE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), sizeof( long ) );
+    bigEndianBuf.WriteLong( expected2 );
+    ASSERT_FALSE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), sizeof( long ) * 2 );
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadLong(), expected1 );
+    ASSERT_FALSE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), sizeof( long ) );
+    ASSERT_ARE_EQUAL( bigEndianBuf.ReadLong(), expected2 );
+    ASSERT_TRUE( bigEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( bigEndianBuf.Size(), 0 );
+    ASSERT_TRUE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), 0 );
+    littleEndianBuf.WriteLong( expected1 );
+    ASSERT_FALSE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), sizeof( long ) );
+    littleEndianBuf.WriteLong( expected2 );
+    ASSERT_FALSE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), sizeof( long ) * 2 );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadLong(), expected1 );
+    ASSERT_FALSE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), sizeof( long ) );
+    ASSERT_ARE_EQUAL( littleEndianBuf.ReadLong(), expected2 );
+    ASSERT_TRUE( littleEndianBuf.Empty() );
+    ASSERT_ARE_EQUAL( littleEndianBuf.Size(), 0 );
 }
 static void TestDataBufferReadWriteULong()
 {
-    throw NotImplementedException();
+    // some tests with previous data types are not possible because the size of an unsigned long is uncertain
 }
 static void TestDataBufferReadWriteCharArray()
 {
