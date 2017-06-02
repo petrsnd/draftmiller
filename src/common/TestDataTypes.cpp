@@ -1,7 +1,6 @@
 // (c) 2017 petrsnd@gmail.com.  All rights reserved.
 
 #include "DataBuffer.h"
-#include "StringUtils.h"
 #include "DataTypes.h"
 
 #include "UnitTestSuite.h"
@@ -82,7 +81,7 @@ static void TestStringToInt()
 
 int main( int argc, char** argv )
 {
-    bool dataTypesAllPassed = false;
+    bool dataTypesAllPassed;
     DECLARE_UNIT_TEST_SUITE( DataTypes )
         ADD_UNIT_TEST( DataTypes, TestBoolToString )
         ADD_UNIT_TEST( DataTypes, TestDoubleToString )

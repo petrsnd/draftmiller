@@ -2,7 +2,6 @@
 
 #include "DataBuffer.h"
 #include "StringUtils.h"
-#include "DataTypes.h"
 
 #include "UnitTestSuite.h"
 
@@ -133,8 +132,10 @@ static void TestReplaceAll()
     ASSERT_ARE_EQUAL( ReplaceAll( "Some text goes here", "GoEs", "not", true ), "Some text not here" );
     ASSERT_ARE_EQUAL( ReplaceAll( "Some text goes here", "SOME teXT GoES", "", true ), " here" );
     ASSERT_ARE_EQUAL( ReplaceAll( "Some text goes here", "here", "", true ), "Some text goes " );
-    ASSERT_ARE_EQUAL( ReplaceAll( "Multi replace multi replaced mulTI, replacement mult", "multi", " a ", true ), " a  replace  a  replaced  a , replacement mult" );
-    ASSERT_ARE_EQUAL( ReplaceAll( "petrsnd:x:10:23:blah:/home/petrsnd:/bin/bash", ":", "", true ), "petrsndx1023blah/home/petrsnd/bin/bash" );
+    ASSERT_ARE_EQUAL( ReplaceAll( "Multi replace multi replaced mulTI, replacement mult", "multi", " a ", true ),
+                      " a  replace  a  replaced  a , replacement mult" );
+    ASSERT_ARE_EQUAL( ReplaceAll( "petrsnd:x:10:23:blah:/home/petrsnd:/bin/bash", ":", "", true ),
+                      "petrsndx1023blah/home/petrsnd/bin/bash" );
 }
 static void TestTrimRight()
 {
@@ -189,7 +190,7 @@ static void TestStringIsNumeric()
 
 int main( int argc, char** argv )
 {
-    bool stringUtilsAllPassed = false;
+    bool stringUtilsAllPassed;
     DECLARE_UNIT_TEST_SUITE( StringUtils )
         ADD_UNIT_TEST( StringUtils, TestStringsCompare )
         ADD_UNIT_TEST( StringUtils, TestStringsAreEqual )
