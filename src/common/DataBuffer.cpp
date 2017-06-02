@@ -2,10 +2,7 @@
 
 #include "DataBuffer.h"
 
-#include <algorithm>
-
 #include <cstdlib>
-#include <cstring>
 
 namespace Magenta {
 
@@ -310,6 +307,34 @@ void DataBuffer::WriteULong( const unsigned long ul )
 {
     m_appender( ( const unsigned char* )&ul, sizeof( unsigned long ) );
 }
+Buffer DataBuffer::ReadBuffer( const size_t len )
+{
+    Buffer ret;
+
+    while ( Size() > 0 )
+    {
+        unsigned char uc = ExtractByte();
+        ret.push_back( uc );
+    }
+    return ret;
+}
+char* DataBuffer::ReadCharArray()
+{
+    Buffer ret;
+    while ( Size() > 0 )
+    {
+        unsigned char uc = ExtractByte();
+        if ( uc == '\0' )
+        {
+            break;
+        }
+        ret.push_back( uc );
+    }
+    ret.push_back( '\0' );
+    char* arr = ( char* )calloc( sizeof( char ), ret.size());
+    memcpy( arr, &ret[0], ret.size() );
+    return arr;
+}
 void DataBuffer::WriteCharArray( const char* c, bool keepNullTerminator )
 {
     WriteCharArray( c, strlen( c ), keepNullTerminator );
@@ -323,6 +348,23 @@ void DataBuffer::WriteCharArray( const char* c, const size_t len, bool addNullTe
     {
         m_data.push_back( '\0' );
     }
+}
+unsigned char* DataBuffer::ReadUCharArray()
+{
+    Buffer ret;
+    while ( Size() > 0 )
+    {
+        unsigned char uc = ExtractByte();
+        if ( uc == '\0' )
+        {
+            break;
+        }
+        ret.push_back( uc );
+    }
+    ret.push_back( '\0' );
+    unsigned char* arr = ( unsigned char* )calloc( sizeof( unsigned char ), ret.size());
+    memcpy( arr, &ret[0], ret.size() );
+    return arr;
 }
 void DataBuffer::WriteUCharArray( const unsigned char* uc, bool keepNullTerminator )
 {
@@ -339,6 +381,10 @@ void DataBuffer::WriteString( const std::string& s, bool addNullTerminator )
 
 unsigned char DataBuffer::ExtractByte()
 {
+    if ( Empty() )
+    {
+        throw DataBufferException( "Attempt to extract byte from empty DataBuffer" );
+    }
     unsigned char ret = m_data[m_frontPos];
     m_frontPos++;
     return ret;

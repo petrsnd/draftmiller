@@ -796,19 +796,108 @@ static void TestDataBufferReadWriteULong()
 }
 static void TestDataBufferReadWriteCharArray()
 {
-    throw NotImplementedException();
+    DataBuffer buf;
+    ASSERT_TRUE( buf.Empty() );
+    buf.WriteCharArray( "abcdefg", false );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), strlen( "abcdefg" ) );
+    char* arr = buf.ReadCharArray();
+    ASSERT_TRUE( strcmp( arr, "abcdefg" ) == 0 );
+    free( arr );
+
+    ASSERT_TRUE( buf.Empty() );
+    buf.WriteCharArray( "1 2 3 4 5 6 asdf jkl;urur ^^%($*#(@*@)", true );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), strlen( "1 2 3 4 5 6 asdf jkl;urur ^^%($*#(@*@)" ) + 1 );
+    arr = buf.ReadCharArray();
+    ASSERT_TRUE( strcmp( arr, "1 2 3 4 5 6 asdf jkl;urur ^^%($*#(@*@)" ) == 0 );
+    free( arr );
+
+    ASSERT_TRUE( buf.Empty() );
+    buf.WriteCharArray( "string 1", true );
+    buf.WriteCharArray( "string 2", true );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), strlen( "string 1" ) + strlen( "string 2" ) + 2 );
+    arr = buf.ReadCharArray();
+    ASSERT_TRUE( strcmp( arr, "string 1" ) == 0 );
+    free( arr );
+    arr = buf.ReadCharArray();
+    ASSERT_TRUE( strcmp( arr, "string 2" ) == 0 );
+    free( arr );
+    ASSERT_TRUE( buf.Empty() );
 }
 static void TestDataBufferReadWriteCharArrayWithLength()
 {
-    throw NotImplementedException();
+    DataBuffer buf;
+    ASSERT_TRUE( buf.Empty() );
+    buf.WriteCharArray( "1234567890", 5, false );
+    buf.WriteCharArray( "abcdefghij", 5, false );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 10 );
+    char* arr = buf.ReadCharArray( 7 );
+    ASSERT_TRUE( strcmp( arr, "12345ab" ) == 0 );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 3 );
+    free( arr );
+    arr = buf.ReadCharArray();
+    ASSERT_TRUE( strcmp( arr, "cde" ) == 0 );
+    free( arr );
+    ASSERT_TRUE( buf.Empty() );
 }
 static void TestDataBufferReadWriteUCharArray()
 {
-    throw NotImplementedException();
+    DataBuffer buf;
+    ASSERT_TRUE( buf.Empty() );
+    unsigned char data[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
+    buf.WriteUCharArray( data, false );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 7 );
+    unsigned char* arr = buf.ReadUCharArray();
+    ASSERT_TRUE( memcmp( arr, data, 7 ) == 0 );
+    free( arr );
+
+    ASSERT_TRUE( buf.Empty() );
+    buf.WriteUCharArray( data, true );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 8 );
+    arr = buf.ReadUCharArray();
+    ASSERT_TRUE( memcmp( arr, data, 8 ) == 0 );
+    free( arr );
+
+    ASSERT_TRUE( buf.Empty() );
+    buf.WriteUCharArray( data, true );
+    buf.WriteUCharArray( data, true );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 16 );
+    arr = buf.ReadUCharArray();
+    ASSERT_TRUE( memcmp( arr, data, 8 ) == 0 );
+    free( arr );
+    arr = buf.ReadUCharArray();
+    ASSERT_TRUE( memcmp( arr, data, 8 ) == 0 );
+    free( arr );
+    ASSERT_TRUE( buf.Empty() );
 }
 static void TestDataBufferReadWriteUCharArrayWithLength()
 {
-    throw NotImplementedException();
+    DataBuffer buf;
+    ASSERT_TRUE( buf.Empty() );
+    unsigned char data1[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
+    unsigned char data2[] = { 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a };
+    buf.WriteUCharArray( data1, 5, false );
+    buf.WriteUCharArray( data2, 5, false );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 10 );
+    unsigned char* arr = buf.ReadUCharArray( 7 );
+    unsigned char expected1[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x11, 0x12 };
+    ASSERT_TRUE( memcmp( arr, expected1, 7 ) == 0 );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 3 );
+    free( arr );
+    arr = buf.ReadUCharArray();
+    unsigned char expected2[] = { 0x13, 0x14, 0x15 };
+    ASSERT_TRUE( memcmp( arr, expected2, 3 ) == 0 );
+    free( arr );
+    ASSERT_TRUE( buf.Empty() );
 }
 static void TestDataBufferReadWriteString()
 {

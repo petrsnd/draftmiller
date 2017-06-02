@@ -26,6 +26,15 @@
 
 namespace Magenta {
 
+class DataBufferException : public Exception
+{
+public:
+    DataBufferException(const std::string& msg ) : Exception( msg )
+    {}
+    virtual ~DataBufferException()
+    {}
+};
+
 class DataBuffer
 {
 private:
@@ -105,12 +114,14 @@ public:
     unsigned long ReadULong();
     void WriteULong( const unsigned long ul );
 
+    Buffer ReadBuffer( const size_t len );
+
     char* ReadCharArray();
     void WriteCharArray( const char* c, bool keepNullTerminator = true );
     char* ReadCharArray( const size_t len );
     void WriteCharArray( const char* c, const size_t len, bool addNullTerminator = false );
 
-    char* ReadUCharArray();
+    unsigned char* ReadUCharArray();
     void WriteUCharArray( const unsigned char* uc, bool keepNullTerminator = true );
     unsigned char* ReadUCharArray( const size_t len );
     void WriteUCharArray( const unsigned char* uc, const size_t len, bool addNullTerminator = false );
