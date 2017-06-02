@@ -1,19 +1,15 @@
 #!/bin/bash
 PREVDIR=`pwd`
 SCRIPTDIR=`cd \`dirname $0\` && pwd`
-BOI=
 BUILDARGS=
 CLEAN=
 FORCE=
 PACKAGE=
-APPSTORE=
 CONF="Release"
 TOOL="$0"
-BUNDLE=
 VERSION=
 BUILDNUMBER=
 FULLVERSION=
-SDKVER=`xcrun --show-sdk-version`
 
 cd "$SCRIPTDIR"
 return_to_previous_directory()
@@ -76,9 +72,9 @@ build()
 {
     set -e
     cd "$SCRIPTDIR/Build"
-    echo "TODO:"
+    make
     if [ -e "$BUNDLE" ]; then
-        echo "Build success -- HashTab bundle at $BUNDLE"
+        echo "Build success -- Artifacts at $SCRIPTDIR/Build"
     else
         echo "Build failed!"
         exit 1

@@ -11,13 +11,13 @@ ADD_LIBRARY( common
 	StringUtils.h )
 
 ADD_EXECUTABLE( testdatabuffer TestDataBuffer.cpp UnitTestSuite.h )
-TARGET_LINK_LIBRARIES( testdatabuffer essentials )
+TARGET_LINK_LIBRARIES( testdatabuffer common )
 
 ADD_EXECUTABLE( testdatatypes TestDataTypes.cpp UnitTestSuite.h )
-TARGET_LINK_LIBRARIES( testdatatypes essentials )
+TARGET_LINK_LIBRARIES( testdatatypes common )
 
 ADD_EXECUTABLE( teststringutils TestStringUtils.cpp UnitTestSuite.h )
-TARGET_LINK_LIBRARIES( teststringutils essentials )
+TARGET_LINK_LIBRARIES( teststringutils common )
 
 ENABLE_TESTING()
 ADD_TEST( DataBuffer testdatabuffer )

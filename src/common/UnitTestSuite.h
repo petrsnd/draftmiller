@@ -55,7 +55,7 @@ protected:
 class UnitTest
 {
 public:
-    typedef std::tr1::function< void () > func_t;
+    typedef std::function< void () > func_t;
     UnitTest( const std::string& name, func_t func ) : m_name( name ), m_func( func )
     {}
     virtual ~UnitTest()
