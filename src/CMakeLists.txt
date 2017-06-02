@@ -3,6 +3,13 @@ cmake_minimum_required( VERSION 3.8.2 )
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/" )
 set( CMAKE_CXX_STANDARD 14 )
 
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib 
+     CACHE PATH "Output directory for static libraries." )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+     CACHE PATH "Output directory for shared libraries." )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+     CACHE PATH "Output directory for executables and shared libraries." )
+
 file( STRINGS "../copyright.txt" COPYRIGHT_INFO )
 file( STRINGS "../version.txt" FULL_VERSION )
 file( STRINGS "../build.txt" BUILD_NUMBER )
