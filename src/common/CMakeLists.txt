@@ -1,6 +1,6 @@
-INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}" )
+include_directories( "${PROJECT_SOURCE_DIR}" )
 
-ADD_LIBRARY( common
+add_library( common
 	Exception.h
 	Primitives.h
 	DataBuffer.cpp
@@ -10,17 +10,12 @@ ADD_LIBRARY( common
 	StringUtils.cpp
 	StringUtils.h )
 
-ADD_EXECUTABLE( testdatabuffer TestDataBuffer.cpp UnitTestSuite.h )
-TARGET_LINK_LIBRARIES( testdatabuffer common )
+add_executable( testdatabuffer TestDataBuffer.cpp UnitTestSuite.h )
+target_link_libraries( testdatabuffer common )
 
-ADD_EXECUTABLE( testdatatypes TestDataTypes.cpp UnitTestSuite.h )
-TARGET_LINK_LIBRARIES( testdatatypes common )
+add_executable( testdatatypes TestDataTypes.cpp UnitTestSuite.h )
+target_link_libraries( testdatatypes common )
 
-ADD_EXECUTABLE( teststringutils TestStringUtils.cpp UnitTestSuite.h )
-TARGET_LINK_LIBRARIES( teststringutils common )
-
-ENABLE_TESTING()
-ADD_TEST( DataBuffer testdatabuffer )
-ADD_TEST( DataTypes testdatatypes )
-ADD_TEST( StringUtil teststringutils )
+add_executable( teststringutils TestStringUtils.cpp UnitTestSuite.h )
+target_link_libraries( teststringutils common )
 

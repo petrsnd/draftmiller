@@ -74,9 +74,16 @@ build()
     cd "$SCRIPTDIR/Build"
     make
     if [ $? -eq 0 ]; then
-        echo "Build success -- Artifacts at $SCRIPTDIR/Build"
+        echo "Build succeeded -- Artifacts at $SCRIPTDIR/Build/"
     else
         echo "Build failed!"
+        exit 1
+    fi
+    make test
+    if [ $? -eq 0 ]; then
+        echo "Unit tests succeeded"
+    else
+        echo "Unit tests failed!"
         exit 1
     fi
     if [ "$PACKAGE" = "true" ]; then
