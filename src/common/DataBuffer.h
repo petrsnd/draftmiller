@@ -106,18 +106,18 @@ public:
     void WriteULong( const unsigned long ul );
 
     char* ReadCharArray();
-    void WriteCharArray( const char* c, bool nullTerminator = true );
+    void WriteCharArray( const char* c, bool keepNullTerminator = true );
     char* ReadCharArray( const size_t len );
-    void WriteCharArray( const char* c, const size_t len, bool nullTerminator = false );
+    void WriteCharArray( const char* c, const size_t len, bool addNullTerminator = false );
 
     char* ReadUCharArray();
-    void WriteUCharArray( const unsigned char* uc, bool nullTerminator = true );
+    void WriteUCharArray( const unsigned char* uc, bool keepNullTerminator = true );
     unsigned char* ReadUCharArray( const size_t len );
-    void WriteUCharArray( const unsigned char* uc, const size_t len, bool nullTerminator = false );
+    void WriteUCharArray( const unsigned char* uc, const size_t len, bool addNullTerminator = false );
 
     std::string ReadString( const size_t len );
     std::string ReadNullTerminatedString();
-    void WriteString( const std::string& s, bool nullTerminator = true );
+    void WriteString( const std::string& s, bool addNullTerminator = true );
 private:
     unsigned char ExtractByte();
     void ByteSwapExtractInteger( unsigned char* ptr, size_t numBytes );

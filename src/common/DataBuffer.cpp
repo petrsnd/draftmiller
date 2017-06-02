@@ -310,31 +310,31 @@ void DataBuffer::WriteULong( const unsigned long ul )
 {
     m_appender( ( const unsigned char* )&ul, sizeof( unsigned long ) );
 }
-void DataBuffer::WriteCharArray( const char* c, bool nullTerminator )
+void DataBuffer::WriteCharArray( const char* c, bool keepNullTerminator )
 {
-    WriteCharArray( c, strlen( c ), nullTerminator );
+    WriteCharArray( c, strlen( c ), keepNullTerminator );
 }
-void DataBuffer::WriteCharArray( const char* c, const size_t len, bool nullTerminator )
+void DataBuffer::WriteCharArray( const char* c, const size_t len, bool addNullTerminator )
 {
     size_t curSize = m_data.size();
     m_data.resize( curSize + len, '\0' );
     memcpy( &m_data[curSize], c, len );
-    if ( nullTerminator )
+    if ( addNullTerminator )
     {
         m_data.push_back( '\0' );
     }
 }
-void DataBuffer::WriteUCharArray( const unsigned char* uc, bool nullTerminator )
+void DataBuffer::WriteUCharArray( const unsigned char* uc, bool keepNullTerminator )
 {
-    WriteCharArray( ( const char* )uc, nullTerminator );
+    WriteCharArray( ( const char* )uc, keepNullTerminator );
 }
-void DataBuffer::WriteUCharArray( const unsigned char* uc, const size_t len, bool nullTerminator )
+void DataBuffer::WriteUCharArray( const unsigned char* uc, const size_t len, bool addNullTerminator )
 {
-    WriteCharArray( ( const char* )uc, len, nullTerminator );
+    WriteCharArray( ( const char* )uc, len, addNullTerminator );
 }
-void DataBuffer::WriteString( const std::string& s, bool nullTerminator )
+void DataBuffer::WriteString( const std::string& s, bool addNullTerminator )
 {
-    WriteCharArray( s.c_str(), s.length(), nullTerminator );
+    WriteCharArray( s.c_str(), s.length(), addNullTerminator );
 }
 
 unsigned char DataBuffer::ExtractByte()
