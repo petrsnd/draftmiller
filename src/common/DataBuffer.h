@@ -2,6 +2,13 @@
 
 // (c) 2017 petrsnd@gmail.com.  All rights reserved.
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include "Exception.h"
+#include "Primitives.h"
+
 #include <string>
 #include <vector>
 #include <functional>
@@ -16,9 +23,6 @@
 #define _INT64_T 1
 #define _UINT64_T 1
 #endif
-
-#include "Exception.h"
-#include "Primitives.h"
 
 namespace Magenta {
 

@@ -2,12 +2,16 @@
 
 // (c) 2017 petrsnd@gmail.com.  All rights reserved.
 
-#include <string>
-#include <vector>
-#include <set>
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include "Exception.h"
 #include "DataBuffer.h"
+
+#include <string>
+#include <vector>
+#include <set>
 
 namespace Magenta {
 

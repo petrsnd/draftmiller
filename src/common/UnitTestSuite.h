@@ -6,13 +6,13 @@
 #include <config.h>
 #endif
 
+#include "Exception.h"
+
 #include <string>
 #include <vector>
 #include <iostream>
 
 #include <functional>
-
-#include "Exception.h"
 
 namespace Magenta {
 
