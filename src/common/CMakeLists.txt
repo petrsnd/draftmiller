@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}" )
 
 ADD_LIBRARY( common
-	BaseException.h
+	Exception.h
 	Primitives.h
 	DataBuffer.cpp
 	DataBuffer.h

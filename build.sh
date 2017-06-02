@@ -46,6 +46,7 @@ check_cmake_version()
 check_for_prerequisites()
 {
     check_for_tool_in_path cmake
+    check_for_tool_in_path dos2unix
     check_cmake_version
 }
 set_version()
@@ -67,7 +68,7 @@ configure()
         rm -rf "$SCRIPTDIR/Build"
         mkdir -p "$SCRIPTDIR/Build"
         cd "$SCRIPTDIR/Build"
-        cmake .. -G "Makefile"
+        cmake ../src -G "Unix Makefiles"
         set +e
     fi
 }
