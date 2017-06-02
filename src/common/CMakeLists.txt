@@ -10,6 +10,8 @@ add_library( common
 	StringUtils.cpp
 	StringUtils.h )
 
+copy_headers_to_include()
+
 add_executable( testdatabuffer TestDataBuffer.cpp UnitTestSuite.h )
 target_link_libraries( testdatabuffer common )
 

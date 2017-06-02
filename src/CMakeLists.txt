@@ -20,6 +20,7 @@ list( GET FULL_VERSION_LIST 1 CMAKE_MINOR_VERSION )
 list( GET FULL_VERSION_LIST 2 CMAKE_PATCH_VERSION )
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/include/config.h )
+add_definitions( -DHAVE_CONFIG_H )
 
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib 
      CACHE PATH "Output directory for static libraries." )
@@ -28,7 +29,7 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
      CACHE PATH "Output directory for executables and shared libraries." )
 
-
+include( CopyHeadersToInclude )
 include_directories( ${CMAKE_BINARY_DIR}/include )
 
 add_subdirectory( common )
