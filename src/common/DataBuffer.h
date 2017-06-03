@@ -39,6 +39,7 @@ class DataBuffer
 {
 private:
     void InitExtractorAndAppender();
+
 public:
     enum Endianness
     {
@@ -116,6 +117,7 @@ public:
 
     Buffer ReadBuffer( const size_t len );
     void WriteBuffer( const Buffer& buf );
+    void WriteBuffer( const Buffer& buf, const size_t len );
 
     char* ReadCharArray();
     void WriteCharArray( const char* c, bool keepNullTerminator = true );
@@ -130,6 +132,8 @@ public:
     std::string ReadString( const size_t len );
     std::string ReadNullTerminatedString();
     void WriteString( const std::string& s, bool addNullTerminator = true );
+    void WriteString( const std::string& s, const size_t len, bool addNullTerminator = true );
+
 private:
     unsigned char ExtractByte();
     void ByteSwapExtractInteger( unsigned char* ptr, size_t numBytes );

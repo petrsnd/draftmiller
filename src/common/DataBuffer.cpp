@@ -337,6 +337,10 @@ void DataBuffer::WriteBuffer( const Buffer& buf )
 {
     WriteUCharArray( &buf[0], buf.size(), false );
 }
+void DataBuffer::WriteBuffer( const Buffer& buf, const size_t len )
+{
+    WriteUCharArray( &buf[0], len, false );
+}
 char* DataBuffer::ReadCharArray()
 {
     Buffer ret;
@@ -397,6 +401,10 @@ void DataBuffer::WriteString( const std::string& s, bool addNullTerminator )
 {
     WriteCharArray( s.c_str(), s.length(), addNullTerminator );
 }
+void DataBuffer::WriteString( const std::string& s, const size_t len, bool addNullTerminator )
+{
+    WriteCharArray( s.c_str(), len, addNullTerminator );
+}
 
 unsigned char DataBuffer::ExtractByte()
 {
@@ -438,4 +446,3 @@ void DataBuffer::NormalAppendInteger( const unsigned char* ptr, size_t numBytes 
 }
 
 } // Magenta
-

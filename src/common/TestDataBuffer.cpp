@@ -4,7 +4,8 @@
 
 #include "UnitTestSuite.h"
 
-using namespace std;
+#include <cstdlib>
+
 using namespace Magenta;
 
 // DataBuffer.h
@@ -901,11 +902,35 @@ static void TestDataBufferReadWriteUCharArrayWithLength()
 }
 static void TestDataBufferReadWriteString()
 {
-    throw NotImplementedException();
+    DataBuffer buf;
+    ASSERT_TRUE( buf.Empty() );
+    buf.WriteString( "1234567890", false );
+    buf.WriteString( "abcdefghij", 5, false );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 15 );
+    std::string arr = buf.ReadString( 7 );
+    ASSERT_TRUE( strcmp( arr.c_str(), "1234567" ) == 0 );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 8 );
+    arr = buf.ReadNullTerminatedString();
+    ASSERT_TRUE( strcmp( arr.c_str(), "890abcde" ) == 0 );
+    ASSERT_TRUE( buf.Empty() );
 }
 static void TestDataBufferReadWriteNullTerminatedString()
 {
-    throw NotImplementedException();
+    DataBuffer buf;
+    ASSERT_TRUE( buf.Empty() );
+    buf.WriteString( "1234567890", true );
+    buf.WriteString( "abcdefghij", 5, true );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 17 );
+    std::string arr = buf.ReadNullTerminatedString();
+    ASSERT_TRUE( strcmp( arr.c_str(), "1234567890" ) == 0 );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 6 );
+    arr = buf.ReadNullTerminatedString();
+    ASSERT_TRUE( strcmp( arr.c_str(), "abcde" ) == 0 );
+    ASSERT_TRUE( buf.Empty() );
 }
 
 

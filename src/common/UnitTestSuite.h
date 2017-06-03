@@ -138,15 +138,18 @@ protected:
 #define FAIL_TEST( msg ) \
     throw UnitTestException( msg )
 #define ASSERT_TRUE( expr ) if ( ! ( expr ) ) \
-    throw UnitTestException( "Assertion failed: ( " + string( #expr ) + " ) did not evaluate to true." );
+    throw UnitTestException( "Assertion failed: ( " + std::string( #expr ) + " ) did not evaluate to true." );
 #define ASSERT_FALSE( expr ) if ( expr ) \
-    throw UnitTestException( "Assertion failed: ( " + string( #expr ) + " ) should evaluate to false." );
+    throw UnitTestException( "Assertion failed: ( " + std::string( #expr ) + " ) should evaluate to false." );
 #define ASSERT_ARE_EQUAL( expr1, expr2 ) if ( ! ( ( expr1 ) == ( expr2 ) ) ) \
-    throw UnitTestException( "Assertion failed: ( " + string( #expr1 ) + " ) is not equal to ( " + string( #expr2 ) + " ), i.e. operator==() returned false" );
+    throw UnitTestException( "Assertion failed: ( " + std::string( #expr1 ) + " ) is not equal to ( " \
+    + std::string( #expr2 ) + " ), i.e. operator==() returned false" );
 #define ASSERT_ARE_NOT_EQUAL( expr1, expr2 ) if ( ! ( ( expr1 ) != ( expr2 ) ) ) \
-    throw UnitTestException( "Assertion failed: ( " + string( #expr1 ) + " ) is *NOT* not equal to ( " + string( #expr2 ) + " ), i.e. operator!=() returned false" );
+    throw UnitTestException( "Assertion failed: ( " + std::string( #expr1 ) + " ) is *NOT* not equal to ( " \
+    + std::string( #expr2 ) + " ), i.e. operator!=() returned false" );
 #define ASSERT_THROWS( expr, excptn ) try { expr; \
-    throw UnitTestException( "Assertion failed: ( " + string( #expr ) + " ) did not throw an exception, expected " + string( #excptn ) ); } catch ( excptn ) {}
+    throw UnitTestException( "Assertion failed: ( " + std::string( #expr ) + " ) did not throw an exception, expected " \
+    + std::string( #excptn ) ); } catch ( excptn ) {}
 
 } // Magenta
 
