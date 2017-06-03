@@ -2,11 +2,6 @@
 
 #include "StringUtils.h"
 
-#include <functional>
-#include <algorithm>
-
-#include <cctype>
-
 namespace Magenta {
 
 struct EqualToNoCaseChar : std::binary_function< char, char, bool >
@@ -98,7 +93,7 @@ std::string ToLower( const std::string& s )
     ret.reserve( s.length() );
     for ( std::string::const_iterator it = s.begin(); it != s.end(); it++ )
     {
-        ret.append( 1, tolower( *it ) );
+        ret.append( 1, ( char )tolower( *it ) );
     }
     return ret;
 }
@@ -108,7 +103,7 @@ std::string ToUpper( const std::string& s )
     ret.reserve( s.length() );
     for ( std::string::const_iterator it = s.begin(); it != s.end(); it++ )
     {
-        ret.append( 1, toupper( *it ) );
+        ret.append( 1, ( char )toupper( *it ) );
     }
     return ret;
 }
@@ -116,7 +111,7 @@ static std::string::iterator FindAndReplace_Internal( std::string& str,
                                                       size_t offset,
                                                       const std::string& replace,
                                                       const std::string& with,
-                                                 bool ignoreCase )
+                                                      bool ignoreCase )
 {
     if ( str.begin() + offset >= str.end() )
     {
@@ -129,7 +124,7 @@ static std::string::iterator FindAndReplace_Internal( std::string& str,
     {
         return str.end();
     }
-    size_t pos = occurrence - str.begin();
+    size_t pos = ( size_t )( occurrence - str.begin() );
     str.replace( occurrence, occurrence + replace.size(), with.begin(), with.end() );
     return str.begin() + pos + with.size();
 }
@@ -147,7 +142,7 @@ std::string ReplaceAll( const std::string& s, const std::string& replace, const 
     std::string::iterator start = tmp.begin();
     while ( true )
     {
-        start = FindAndReplace_Internal( tmp, start - tmp.begin(), replace, with, ignoreCase );
+        start = FindAndReplace_Internal( tmp, ( size_t )( start - tmp.begin() ), replace, with, ignoreCase );
         if ( start == tmp.end() )
         {
             break;

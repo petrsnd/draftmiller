@@ -4,8 +4,6 @@
 
 #include "StringUtils.h"
 
-#include <sstream>
-
 namespace Magenta {
 
 TypeConversionException::TypeConversionException( const std::string& from,
@@ -41,7 +39,7 @@ bool StringToBool( const std::string& s )
 {
     // Anything but "true" returns false
     std::string tmp = Trim( s );
-    return ( ToLower( tmp ) == "true" ? true : false );
+    return ToLower(tmp ) == "true";
 }
 double StringToDouble( const std::string& s )
 {

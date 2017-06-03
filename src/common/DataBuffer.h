@@ -115,6 +115,7 @@ public:
     void WriteULong( const unsigned long ul );
 
     Buffer ReadBuffer( const size_t len );
+    void WriteBuffer( const Buffer& buf );
 
     char* ReadCharArray();
     void WriteCharArray( const char* c, bool keepNullTerminator = true );

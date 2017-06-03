@@ -1,8 +1,7 @@
 // (c) 2017 petrsnd@gmail.com.  All rights reserved.
 
 #include "DataBuffer.h"
-
-#include <cstdlib>
+#include "StringUtils.h"
 
 namespace Magenta {
 
@@ -198,18 +197,32 @@ unsigned long DataBuffer::ReadULong()
 }
 char* DataBuffer::ReadCharArray( const size_t len )
 {
-    size_t cpyLen = ( len < Size() ? len : Size() );
+    if ( Size() < len )
+    {
+        throw DataBufferException(
+                SC() << "Request to read CharArray (" << len << ") larger than DataBuffer (" << Size() << ")" );
+    }
     char* ret = ( char* )calloc( sizeof( char ), len + 1);
-    memcpy( ret, &m_data[m_frontPos], cpyLen );
-    m_frontPos += cpyLen;
+    memcpy( ret, &m_data[m_frontPos], len );
+    m_frontPos += len;
     return ret;
 }
 unsigned char* DataBuffer::ReadUCharArray( const size_t len )
 {
+    if ( Size() < len )
+    {
+        throw DataBufferException(
+                SC() << "Request to read UCharArray (" << len << ") larger than DataBuffer (" << Size() << ")" );
+    }
     return ( unsigned char* )ReadCharArray( len );
 }
 std::string DataBuffer::ReadString( const size_t len )
 {
+    if ( Size() < len )
+    {
+        throw DataBufferException(
+                SC() << "Request to read String (" << len << ") larger than DataBuffer (" << Size() << ")" );
+    }
     char* c = ReadCharArray( len );
     return std::string( c, len );
 }
@@ -310,13 +323,19 @@ void DataBuffer::WriteULong( const unsigned long ul )
 Buffer DataBuffer::ReadBuffer( const size_t len )
 {
     Buffer ret;
-
-    while ( Size() > 0 )
+    if ( Size() < len )
     {
-        unsigned char uc = ExtractByte();
-        ret.push_back( uc );
+        throw DataBufferException(
+                SC() << "Request to read Buffer (" << len << ") larger than DataBuffer (" << Size() << ")" );
     }
+    ret.resize( len );
+    memcpy( &ret[0], &m_data[0], len );
+    m_frontPos += len;
     return ret;
+}
+void DataBuffer::WriteBuffer( const Buffer& buf )
+{
+    WriteUCharArray( &buf[0], buf.size(), false );
 }
 char* DataBuffer::ReadCharArray()
 {

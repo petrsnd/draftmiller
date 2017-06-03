@@ -7,8 +7,27 @@
 #endif
 
 #include <string>
+#include <sstream>
 
 namespace Magenta {
+
+class StringCreator
+{
+public:
+    template< typename T >
+    StringCreator& operator<<(T value)
+    {
+        m_ss << value;
+        return *this;
+    }
+    operator std::string() const
+    {
+        return m_ss.str();
+    }
+private:
+    std::stringstream m_ss;
+};
+typedef StringCreator SC;
 
 // Comparison Functions
 int StringsCompare( const std::string& s1, const std::string& s2, bool ignoreCase = false );
