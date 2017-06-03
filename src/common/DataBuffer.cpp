@@ -320,6 +320,14 @@ void DataBuffer::WriteULong( const unsigned long ul )
 {
     m_appender( ( const unsigned char* )&ul, sizeof( unsigned long ) );
 }
+Buffer DataBuffer::ReadBuffer()
+{
+    Buffer ret;
+    ret.resize( m_data.size() - m_frontPos );
+    memcpy( &ret[0], &m_data[m_frontPos], m_data.size() - m_frontPos );
+    m_frontPos += ( m_data.size() - m_frontPos );
+    return ret;
+}
 Buffer DataBuffer::ReadBuffer( const size_t len )
 {
     Buffer ret;

@@ -115,6 +115,7 @@ public:
     unsigned long ReadULong();
     void WriteULong( const unsigned long ul );
 
+    Buffer ReadBuffer();
     Buffer ReadBuffer( const size_t len );
     void WriteBuffer( const Buffer& buf );
     void WriteBuffer( const Buffer& buf, const size_t len );

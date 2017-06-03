@@ -4,8 +4,6 @@
 
 #include "UnitTestSuite.h"
 
-#include <cstdlib>
-
 using namespace Magenta;
 
 // DataBuffer.h
@@ -932,6 +930,28 @@ static void TestDataBufferReadWriteNullTerminatedString()
     ASSERT_TRUE( strcmp( arr.c_str(), "abcde" ) == 0 );
     ASSERT_TRUE( buf.Empty() );
 }
+static void TestDataBufferReadWriteBuffer()
+{
+    DataBuffer buf;
+    ASSERT_TRUE( buf.Empty() );
+    Buffer data1 = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
+    Buffer data2 = { 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a };
+    buf.WriteBuffer( data1, 5 );
+    buf.WriteBuffer( data2 );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 15 );
+    Buffer arr = buf.ReadBuffer( 7 );
+    Buffer expected1 = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x11, 0x12 };
+    ASSERT_TRUE( memcmp( &arr[0], &expected1[0], expected1.size() ) == 0 );
+    ASSERT_FALSE( buf.Empty() );
+    ASSERT_ARE_EQUAL( buf.Size(), 8 );
+    arr = buf.ReadBuffer();
+    Buffer expected2 = { 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a };
+    ASSERT_TRUE( memcmp( &arr[0], &expected2[0], expected2.size() ) == 0 );
+    ASSERT_TRUE( buf.Empty() );
+    arr = buf.ReadBuffer();
+    ASSERT_TRUE( arr.empty() );
+}
 
 
 int main( int argc, char** argv )
@@ -967,6 +987,7 @@ int main( int argc, char** argv )
         ADD_UNIT_TEST( DataBuffers, TestDataBufferReadWriteUCharArrayWithLength )
         ADD_UNIT_TEST( DataBuffers, TestDataBufferReadWriteString )
         ADD_UNIT_TEST( DataBuffers, TestDataBufferReadWriteNullTerminatedString )
+        ADD_UNIT_TEST( DataBuffers, TestDataBufferReadWriteBuffer )
     END_UNIT_TEST_SUITE( DataBuffers, dataBufferAllPassed )
 
     return ( dataBufferAllPassed ? 0 : 1 );
