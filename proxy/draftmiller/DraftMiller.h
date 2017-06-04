@@ -178,7 +178,7 @@ struct DmSignResponse
 struct DmExtensionFailure
 {
     const DmMessageNumber Number = SSH_AGENT_EXTENSION_FAILURE;
-    
+
 };
 
 // Unknown Message
