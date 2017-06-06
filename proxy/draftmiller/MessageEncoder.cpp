@@ -27,6 +27,21 @@ static Buffer DmEncodePacket( const DataBuffer& db )
     return packet;
 }
 
+
+Buffer DmEncodeFailure()
+{
+    DataBuffer db;
+    db.WriteUInt8( SSH_AGENT_FAILURE );
+    return DmEncodePacket( db );
+}
+
+Buffer DmEncodeSuccess()
+{
+    DataBuffer db;
+    db.WriteUInt8( SSH_AGENT_SUCCESS );
+    return DmEncodePacket( db );
+}
+
 Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitiesAnswer )
 {
     if ( identitiesAnswer == nullptr )

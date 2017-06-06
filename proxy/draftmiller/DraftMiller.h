@@ -282,12 +282,20 @@ public:
     {}
 };
 
+/// Encode a DmFailure message as a buffer
+Buffer DmEncodeFailure();
+
+/// Encode a DmSuccess message as a buffer
+Buffer DmEncodeSuccess();
+
 /// Encode a DmIdentitiesAnswer message as a buffer
 /// @param identitiesAnswer Shared pointer to a DmIdentitiesAnswer structure
+/// @throws DmEncodeException
 Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitiesAnswer );
 
 /// Encode a DmSignResponse message as a buffer
 /// @param signResponse Shared pointer to a DmSignResponse structure
+/// @throws DmEncodeException
 Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse );
 
 // Matt --

@@ -42,12 +42,16 @@ static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t siz
 
         // Responses
         case SSH_AGENT_FAILURE:
+            return std::make_shared< DmFailure >();
         case SSH_AGENT_SUCCESS:
+            return std::make_shared< DmSuccess >();
         case SSH_AGENT_IDENTITIES_ANSWER:
         case SSH_AGENT_SIGN_RESPONSE:
         case SSH_AGENT_EXTENSION_FAILURE:
-            throw DmParseException( SC() << "Message was a response packet" );
+            throw DmParseException(
+                SC() << "Response message not currently supported for parsing (" << messageNumber << ")" );
 
+        // Requests
         case SSH_AGENTC_REQUEST_IDENTITIES:
             return std::make_shared< DmRequestIdentities >();
         case SSH_AGENTC_SIGN_REQUEST:
@@ -55,7 +59,10 @@ static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t siz
 
         case SSH_AGENTC_ADD_IDENTITY:
         case SSH_AGENTC_REMOVE_IDENTITY:
+            throw DmParseException(
+                SC() << "Request message not currently supoorted for parsing (" << messageNumber << ")" );
         case SSH_AGENTC_REMOVE_ALL_IDENTITIES:
+            return std::make_shared< DmRemoveAllIdentities >();
         case SSH_AGENTC_ADD_SMARTCARD_KEY:
         case SSH_AGENTC_REMOVE_SMARTCARD_KEY:
         case SSH_AGENTC_LOCK:
@@ -63,7 +70,8 @@ static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t siz
         case SSH_AGENTC_ADD_ID_CONSTRAINED:
         case SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED:
         case SSH_AGENTC_EXTENSION:
-            throw DmParseException( SC() << "Valid message currently unsupoorted (" << messageNumber << ")" );
+            throw DmParseException(
+                SC() << "Request message not currently supported for parsing (" << messageNumber << ")" );
         default:
             DmUnknownMessage::Ptr unknownMessage = std::make_shared< DmUnknownMessage >(
                 static_cast< DmMessageNumber >( messageNumber ) );
