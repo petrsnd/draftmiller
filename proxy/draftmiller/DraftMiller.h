@@ -3,11 +3,17 @@
 // (c) 2017 petrsnd@gmail.com.  All rights reserved.
 
 #include <Primitives.h>
+#include <Exception.h>
 
 #include <cstdint>
+#include <string>
+#include <vector>
+#include <utility>
+#include <memory>
 
 namespace Magenta {
 
+// Definitions
 enum DmMessageNumber : uint8_t
 {
     SSH_LEGACY_RESERVED_MESSAGE_1               = 1,
@@ -69,123 +75,224 @@ enum DmSignatureFlags
     SSH_AGENT_RSA_SHA2_512                      = 4
 };
 
-struct DmMessage
+// Packet
+struct DmPacket
 {
     uint32_t Length;
     Buffer Contents;
 };
 
 // Message Parts
-// TODO: some will need typedef for lists of type vector< T >
+struct DmKey
+{
+    Buffer KeyBlob;
+    std::string Comment;
+    typedef std::vector< DmKey > List;
+};
 
 // Request Messages
-struct DmRequestIdentities
+struct DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_REQUEST_IDENTITIES;
-
+    DmMessage(const DmMessageNumber number) :
+        Number( number )
+    {}
+    virtual ~DmMessage()
+    {}
+    const DmMessageNumber Number;
+    typedef std::shared_ptr< DmMessage > Ptr;
 };
 
-struct DmSignRequest
+struct DmRequestIdentities : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_SIGN_REQUEST;
-
+    DmRequestIdentities() :
+        DmMessage( SSH_AGENTC_REQUEST_IDENTITIES )
+    {}
+    typedef std::shared_ptr< DmRequestIdentities > Ptr;
 };
 
-struct DmAddIdentity
+struct DmSignRequest : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_ADD_IDENTITY;
-
+    DmSignRequest() :
+        DmMessage( SSH_AGENTC_SIGN_REQUEST )
+    {}
+    Buffer KeyBlob;
+    Buffer Data;
+    uint32_t Flags;
+    typedef std::shared_ptr< DmSignRequest > Ptr;
 };
 
-struct DmRemoveIdentity
+struct DmAddIdentity : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_REMOVE_IDENTITY;
-
+    DmAddIdentity() :
+        DmMessage( SSH_AGENTC_ADD_IDENTITY )
+    {}
+    typedef std::shared_ptr< DmAddIdentity > Ptr;
 };
 
-struct DmRemoveAllIdentities
+struct DmRemoveIdentity : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_REMOVE_ALL_IDENTITIES;
-
+    DmRemoveIdentity() :
+        DmMessage( SSH_AGENTC_REMOVE_IDENTITY )
+    {}
+    typedef std::shared_ptr< DmRemoveIdentity > Ptr;
 };
 
-struct DmAddIdentityConstrained
+struct DmRemoveAllIdentities : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_ADD_ID_CONSTRAINED;
-
+    DmRemoveAllIdentities() :
+        DmMessage( SSH_AGENTC_REMOVE_ALL_IDENTITIES )
+    {}
+    typedef std::shared_ptr< DmRemoveAllIdentities > Ptr;
 };
 
-struct DmAddSmartCardKey
+struct DmAddIdentityConstrained : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED;
-
+    DmAddIdentityConstrained() :
+        DmMessage( SSH_AGENTC_ADD_ID_CONSTRAINED )
+    {}
+    typedef std::shared_ptr< DmAddIdentityConstrained > Ptr;
 };
 
-struct DmRemoveSmartCardKey
+struct DmAddSmartCardKey : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_REMOVE_SMARTCARD_KEY;
+    DmAddSmartCardKey() :
+        DmMessage( SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED )
+    {}
+    typedef std::shared_ptr< DmAddSmartCardKey > Ptr;
 };
 
-struct DmLock
+struct DmRemoveSmartCardKey : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_LOCK;
-
+    DmRemoveSmartCardKey() :
+        DmMessage( SSH_AGENTC_REMOVE_SMARTCARD_KEY )
+    {}
+    typedef std::shared_ptr< DmRemoveSmartCardKey > Ptr;
 };
 
-struct DmUnlock
+struct DmLock : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_UNLOCK;
-
+    DmLock() :
+        DmMessage( SSH_AGENTC_LOCK )
+    {}
+    typedef std::shared_ptr< DmLock > Ptr;
 };
 
-struct DmAddSmartCardKeyConstrained
+struct DmUnlock : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED;
-
+    DmUnlock() :
+        DmMessage( SSH_AGENTC_UNLOCK )
+    {}
+    typedef std::shared_ptr< DmUnlock > Ptr;
 };
 
-struct DmExtension
+struct DmAddSmartCardKeyConstrained : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENTC_EXTENSION;
+    DmAddSmartCardKeyConstrained() :
+        DmMessage( SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED )
+    {}
+    typedef std::shared_ptr< DmAddSmartCardKeyConstrained > Ptr;
+};
 
+struct DmExtension : public DmMessage
+{
+    DmExtension() :
+        DmMessage( SSH_AGENTC_EXTENSION )
+    {}
+    typedef std::shared_ptr< DmExtension > Ptr;
 };
 
 // Response Messages
-struct DmFailure
+struct DmFailure : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENT_FAILURE;
-
+    DmFailure() :
+        DmMessage( SSH_AGENT_FAILURE )
+    {}
+    typedef std::shared_ptr< DmFailure > Ptr;
 };
 
-struct DmSuccess
+struct DmSuccess : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENT_SUCCESS;
-
+    DmSuccess() :
+        DmMessage( SSH_AGENT_SUCCESS )
+    {}
+    typedef std::shared_ptr< DmSuccess > Ptr;
 };
 
-struct DmIdentitiesAnswer
+struct DmIdentitiesAnswer : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENT_IDENTITIES_ANSWER;
-
+    DmIdentitiesAnswer() :
+        DmMessage( SSH_AGENT_IDENTITIES_ANSWER )
+    {}
+    uint32_t NumberKeys;
+    DmKey::List Keys;
+    typedef std::shared_ptr< DmIdentitiesAnswer > Ptr;
 };
 
-struct DmSignResponse
+struct DmSignResponse : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENT_SIGN_RESPONSE;
-
+    DmSignResponse() :
+        DmMessage( SSH_AGENT_SIGN_RESPONSE )
+    {}
+    Buffer Signature;
+    typedef std::shared_ptr< DmSignResponse > Ptr;
 };
 
-struct DmExtensionFailure
+struct DmExtensionFailure : public DmMessage
 {
-    const DmMessageNumber Number = SSH_AGENT_EXTENSION_FAILURE;
-
+    DmExtensionFailure() :
+        DmMessage( SSH_AGENT_EXTENSION_FAILURE )
+    {}
+    typedef std::shared_ptr< DmExtensionFailure > Ptr;
 };
 
 // Unknown Message
-struct DmUnknownMessage
+struct DmUnknownMessage : public DmMessage
 {
-    uint8_t Number;
+    DmUnknownMessage( const DmMessageNumber number ) :
+        DmMessage( number )
+    {}
     Buffer Payload;
+    typedef std::shared_ptr< DmUnknownMessage > Ptr;
 };
+
+// API
+class DmParseException : public Exception
+{
+public:
+    DmParseException( const std::string& msg ) :
+        Exception( msg )
+    {}
+    virtual ~DmParseException()
+    {}
+};
+
+/// Parse one DmMessage from the buffer and modify the buffer to remove those bytes
+/// @param buffer A buffer containing at least one DmMessage
+/// @throws DmParseException
+DmMessage::Ptr DmParseMessage( Buffer& buffer );
+
+
+class DmEncodeException : public Exception
+{
+public:
+    DmEncodeException( const std::string& msg ) :
+        Exception( msg )
+    {}
+    virtual ~DmEncodeException()
+    {}
+};
+
+/// Encode a DmIdentitiesAnswer message as a buffer
+/// @param identitiesAnswer Shared pointer to a DmIdentitiesAnswer structure
+Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitiesAnswer );
+
+/// Encode a DmSignResponse message as a buffer
+/// @param signResponse Shared pointer to a DmSignResponse structure
+Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse );
+
+// Matt --
+// I don't like this interface, because I give you back a DmMessage, and you have to look at
+// the number field to know what it is and then dynamic_cast it to the right message type
+// The interface we should have is for you to register handlers for each of the message types
 
 } // Magenta

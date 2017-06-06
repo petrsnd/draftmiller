@@ -29,7 +29,8 @@ namespace Magenta {
 class DataBufferException : public Exception
 {
 public:
-    DataBufferException(const std::string& msg ) : Exception( msg )
+    DataBufferException(const std::string& msg ) :
+        Exception( msg )
     {}
     virtual ~DataBufferException()
     {}
@@ -52,6 +53,8 @@ public:
     DataBuffer( const DataBuffer& d );
     ~DataBuffer();
     DataBuffer& operator=( const DataBuffer& d );
+
+    operator Buffer() const;
 
     void Clear();
     size_t Size() const;

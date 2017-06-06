@@ -70,6 +70,10 @@ DataBuffer& DataBuffer::operator=( const DataBuffer& d )
     InitExtractorAndAppender();
     return *this;
 }
+DataBuffer::operator Buffer() const
+{
+    return Buffer( m_data.begin() + m_frontPos, m_data.end() );
+}
 void DataBuffer::Clear()
 {
     m_data.clear();
