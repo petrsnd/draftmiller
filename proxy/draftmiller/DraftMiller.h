@@ -10,6 +10,7 @@
 #include <vector>
 #include <utility>
 #include <memory>
+#include <map>
 
 namespace Magenta {
 
@@ -256,6 +257,16 @@ struct DmUnknownMessage : public DmMessage
 };
 
 // API
+class DmIncompletePacketException : public Exception
+{
+public:
+    DmIncompletePacketException( const std::string& msg ) :
+        Exception( msg )
+    {}
+    virtual ~DmIncompletePacketException()
+    {}
+};
+
 class DmParseException : public Exception
 {
 public:
@@ -269,6 +280,7 @@ public:
 /// Parse one DmMessage from the buffer and modify the buffer to remove those bytes
 /// @param buffer A buffer containing at least one DmMessage
 /// @throws DmParseException
+/// @returns A generic DmMessage structure that can be cast to the appropriate message type
 DmMessage::Ptr DmParseMessage( Buffer& buffer );
 
 
@@ -283,24 +295,56 @@ public:
 };
 
 /// Encode a DmFailure message as a buffer
+/// @returns A buffer containing a DmFailure message
 Buffer DmEncodeFailure();
 
 /// Encode a DmSuccess message as a buffer
+/// @returns A buffer containing a DmSuccess message
 Buffer DmEncodeSuccess();
 
 /// Encode a DmIdentitiesAnswer message as a buffer
 /// @param identitiesAnswer Shared pointer to a DmIdentitiesAnswer structure
 /// @throws DmEncodeException
+/// @returns A buffer containing a DmIdentitiesAnswer message
 Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitiesAnswer );
 
 /// Encode a DmSignResponse message as a buffer
 /// @param signResponse Shared pointer to a DmSignResponse structure
 /// @throws DmEncodeException
+/// @returns A buffer containing a DmSignResponse message
 Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse );
 
-// Matt --
-// I don't like this interface, because I give you back a DmMessage, and you have to look at
-// the number field to know what it is and then dynamic_cast it to the right message type
-// The interface we should have is for you to register handlers for each of the message types
+
+/// Singleton class for accessing message handlers.
+/// This class will parse a buffer, determine the request message type, then invoke the message handler
+/// for that request message.  After the registered handler provides the response, this class will encode
+/// the response buffer that may be returned to the client.  You must register handlers for any messages
+/// that you would like to support in your agent.
+class DraftMiller
+{
+public:
+    typedef std::shared_ptr< DraftMiller > Ptr;
+private:
+    typedef std::function< DmMessage::Ptr ( const DmMessage::Ptr& ) > MessageHandler;
+    std::map< DmMessageNumber, MessageHandler > m_handlerRegistry;
+public:
+    /// Obtain an instance of the singleton
+    /// @returns A singleton instance of the draft miller implementation
+    static DraftMiller::Ptr Instance();
+    /// Register a handler for a particular message type
+    /// @param number The number of the message type to register
+    /// @param handler The handler to be called when this message is parsed
+    /// @returns A bool only so it can do the static registration
+    bool Register( const DmMessageNumber number, const MessageHandler& handler );
+    /// Handle a request message buffer and obtain a response message buffer.
+    /// All valid messages will be removed even if a handler is not registered.  They will simply return
+    /// a failure message.  If a message cannot be parsed because a complete packet was not found in the
+    /// buffer, an exception will be thrown.  It should be handled.  You should read more data and then
+    /// call this method again.
+    /// @param buffer A buffer to be handled, this parameter will be modified as messages are handled
+    /// @throws DmParseException, DmEncodeException
+    Buffer HandleMessage( Buffer& buffer );
+
+};
 
 } // Magenta

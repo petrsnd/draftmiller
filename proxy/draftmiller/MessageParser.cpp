@@ -90,7 +90,7 @@ DmMessage::Ptr DmParseMessage( Buffer& buffer )
         uint32_t packetSize = db.ReadUInt32();
         if ( db.Size() < packetSize )
         {
-            throw DmParseException(
+            throw DmIncompletePacketException(
                 SC() << "Buffer does not contain enough bytes for packet size: " << packetSize );
         }
         DmMessage::Ptr parsedMessage = DmParseMessageInternal( db, packetSize );
