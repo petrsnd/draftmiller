@@ -7,6 +7,7 @@
 
 namespace Magenta {
 
+// Encode primitives
 static void DmEncodeString( DataBuffer& db, const std::string& str )
 {
     db.WriteUInt32( str.length() );
@@ -27,22 +28,22 @@ static Buffer DmEncodePacket( const DataBuffer& db )
     return packet;
 }
 
-
-Buffer DmEncodeFailure()
+// Encode responses
+static Buffer DmEncodeFailure()
 {
     DataBuffer db;
     db.WriteUInt8( SSH_AGENT_FAILURE );
     return DmEncodePacket( db );
 }
 
-Buffer DmEncodeSuccess()
+static Buffer DmEncodeSuccess()
 {
     DataBuffer db;
     db.WriteUInt8( SSH_AGENT_SUCCESS );
     return DmEncodePacket( db );
 }
 
-Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitiesAnswer )
+static Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitiesAnswer )
 {
     if ( identitiesAnswer == nullptr )
     {
@@ -65,7 +66,7 @@ Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitiesAnswer
     return DmEncodePacket( db );
 }
 
-Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse )
+static Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse )
 {
     if ( signResponse == nullptr )
     {
@@ -75,6 +76,67 @@ Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse )
     db.WriteUInt8( signResponse->Number );
     DmEncodeString( db, signResponse->Signature );
     return DmEncodePacket( db );
+}
+
+
+Buffer DmEncodeMessage( const DmMessage::Ptr& message )
+{
+    switch ( static_cast< DmMessageNumber >( message->Number ) )
+    {
+        case SSH_LEGACY_RESERVED_MESSAGE_1:
+        case SSH_LEGACY_RESERVED_MESSAGE_2:
+        case SSH_LEGACY_RESERVED_MESSAGE_3:
+        case SSH_LEGACY_RESERVED_MESSAGE_4:
+        case SSH_LEGACY_RESERVED_MESSAGE_7:
+        case SSH_LEGACY_RESERVED_MESSAGE_8:
+        case SSH_LEGACY_RESERVED_MESSAGE_9:
+        case SSH_LEGACY_RESERVED_MESSAGE_10:
+        case SSH_LEGACY_RESERVED_MESSAGE_15:
+        case SSH_LEGACY_RESERVED_MESSAGE_16:
+        case SSH_LEGACY_RESERVED_MESSAGE_24:
+            throw DmEncodeException( SC() << "Legacy message not supported (" << message->Number << ")" );
+
+        // Responses
+        case SSH_AGENT_FAILURE:
+            return DmEncodeFailure();
+        case SSH_AGENT_SUCCESS:
+            return DmEncodeSuccess();
+        case SSH_AGENT_IDENTITIES_ANSWER:
+            return DmEncodeIdentitiesAnswer( std::dynamic_pointer_cast< DmIdentitiesAnswer >( message ) );
+        case SSH_AGENT_SIGN_RESPONSE:
+            return DmEncodeSignResponse( std::dynamic_pointer_cast< DmSignResponse >( message ) );
+        case SSH_AGENT_EXTENSION_FAILURE:
+            throw DmEncodeException(
+                SC() << "Response message not currently supported for encoding (" << message->Number << ")" );
+
+        // Requests
+        case SSH_AGENTC_REQUEST_IDENTITIES:
+
+        case SSH_AGENTC_SIGN_REQUEST:
+
+
+        case SSH_AGENTC_ADD_IDENTITY:
+        case SSH_AGENTC_REMOVE_IDENTITY:
+            throw DmEncodeException(
+                SC() << "Request message not currently supported for encoding (" << message->Number << ")" );
+        case SSH_AGENTC_REMOVE_ALL_IDENTITIES:
+
+        case SSH_AGENTC_ADD_SMARTCARD_KEY:
+        case SSH_AGENTC_REMOVE_SMARTCARD_KEY:
+        case SSH_AGENTC_LOCK:
+        case SSH_AGENTC_UNLOCK:
+        case SSH_AGENTC_ADD_ID_CONSTRAINED:
+        case SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED:
+        case SSH_AGENTC_EXTENSION:
+            throw DmEncodeException(
+                SC() << "Request message not currently supported for encoding (" << message->Number << ")" );
+        default:
+            DmUnknownMessage::Ptr unknownMessage = std::dynamic_pointer_cast< DmUnknownMessage >( message );
+            DataBuffer db;
+            db.WriteUInt8( SSH_UNKNOWN_MESSAGE );
+            db.WriteBuffer( unknownMessage->Payload );
+            return DmEncodePacket( db );
+    }
 }
 
 } // Magenta

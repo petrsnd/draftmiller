@@ -60,6 +60,9 @@ enum DmMessageNumber : uint8_t
 
     // Known Extensions
 
+
+    // Unknown Message
+    SSH_UNKNOWN_MESSAGE                         = 0
 };
 
 enum DmContraints
@@ -294,25 +297,11 @@ public:
     {}
 };
 
-/// Encode a DmFailure message as a buffer
-/// @returns A buffer containing a DmFailure message
-Buffer DmEncodeFailure();
-
-/// Encode a DmSuccess message as a buffer
-/// @returns A buffer containing a DmSuccess message
-Buffer DmEncodeSuccess();
-
-/// Encode a DmIdentitiesAnswer message as a buffer
-/// @param identitiesAnswer Shared pointer to a DmIdentitiesAnswer structure
+/// Encode one DmMessage based on the generic DmMessage structure passed in
+/// @param message A smart pointer to a generic DmMessage structure
 /// @throws DmEncodeException
-/// @returns A buffer containing a DmIdentitiesAnswer message
-Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitiesAnswer );
-
-/// Encode a DmSignResponse message as a buffer
-/// @param signResponse Shared pointer to a DmSignResponse structure
-/// @throws DmEncodeException
-/// @returns A buffer containing a DmSignResponse message
-Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse );
+/// @returns A buffer containing the encoded message
+Buffer DmEncodeMessage( const DmMessage::Ptr& message );
 
 
 /// Singleton class for accessing message handlers.

@@ -22,7 +22,7 @@ static DmMessage::Ptr DmParseSignRequest( DataBuffer& db )
     return signRequest;
 }
 
-static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t size)
+static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t size )
 {
     uint8_t messageNumber = db.ReadUInt8();
     switch ( static_cast< DmMessageNumber >( messageNumber ) )
@@ -60,7 +60,7 @@ static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t siz
         case SSH_AGENTC_ADD_IDENTITY:
         case SSH_AGENTC_REMOVE_IDENTITY:
             throw DmParseException(
-                SC() << "Request message not currently supoorted for parsing (" << messageNumber << ")" );
+                SC() << "Request message not currently supported for parsing (" << messageNumber << ")" );
         case SSH_AGENTC_REMOVE_ALL_IDENTITIES:
             return std::make_shared< DmRemoveAllIdentities >();
         case SSH_AGENTC_ADD_SMARTCARD_KEY:

@@ -19,10 +19,10 @@ Buffer DraftMiller::HandleMessage( Buffer& buffer )
         if ( it != std::end( m_handlerRegistry ) )
         {
             DmMessage::Ptr response = it->second( request );
-            // TODO: Call encoders
-            return DmEncodeFailure();
+            return DmEncodeMessage( response );
         }
-        return DmEncodeFailure();
+        // TODO: Log?
+        return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
     }
     catch ( DmIncompletePacketException& ex )
     {
@@ -31,7 +31,7 @@ Buffer DraftMiller::HandleMessage( Buffer& buffer )
     catch ( Exception& ex )
     {
         // TODO: Log?
-        return DmEncodeFailure();
+        return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
     }
 }
 
