@@ -5,7 +5,6 @@
 
 #include "UnitTestSuite.h"
 
-using namespace std;
 using namespace Magenta;
 
 // DataTypes.h
@@ -93,4 +92,3 @@ int main( int argc, char** argv )
 
     return ( dataTypesAllPassed ? 0 : 1 );
 }
-

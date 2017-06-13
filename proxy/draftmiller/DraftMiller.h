@@ -333,7 +333,6 @@ public:
     /// @param buffer A buffer to be handled, this parameter will be modified as messages are handled
     /// @throws DmParseException, DmEncodeException
     Buffer HandleMessage( Buffer& buffer );
-
 };
 
 } // Magenta

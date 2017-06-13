@@ -10,20 +10,20 @@ namespace Magenta {
 // Encode primitives
 static void DmEncodeString( DataBuffer& db, const std::string& str )
 {
-    db.WriteUInt32( str.length() );
+    db.WriteUInt32( static_cast< uint32_t >( str.length() ) );
     db.WriteString( str, false );
 }
 
 static void DmEncodeString( DataBuffer& db, const Buffer& buf )
 {
-    db.WriteUInt32( buf.size() );
+    db.WriteUInt32( static_cast< uint32_t >( buf.size() ) );
     db.WriteBuffer( buf );
 }
 
 static Buffer DmEncodePacket( const DataBuffer& db )
 {
     DataBuffer packet;
-    packet.WriteUInt32( db.Size() );
+    packet.WriteUInt32( static_cast< uint32_t >( db.Size() ) );
     packet.WriteBuffer( db );
     return packet;
 }
@@ -78,10 +78,37 @@ static Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse )
     return DmEncodePacket( db );
 }
 
+// Encode requests
+static Buffer DmEncodeRequestIdentities( const DmRequestIdentities::Ptr& requestIdentities )
+{
+    if ( requestIdentities == nullptr )
+    {
+        throw DmEncodeException( "Request identities structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( requestIdentities->Number );
+    return DmEncodePacket( db );
+}
+
+static Buffer DmEncodeSignRequest( const DmSignRequest::Ptr& signRequest )
+{
+    if ( signRequest == nullptr )
+    {
+        throw DmEncodeException( "Sign request structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( signRequest->Number );
+    db.WriteUInt32( static_cast< uint32_t >( signRequest->KeyBlob.size() ) );
+    db.WriteBuffer( signRequest->KeyBlob );
+    db.WriteUInt32( static_cast< uint32_t >( signRequest->Data.size() ) );
+    db.WriteBuffer( signRequest->Data );
+    db.WriteUInt32( signRequest->Flags );
+    return DmEncodePacket( db );
+}
 
 Buffer DmEncodeMessage( const DmMessage::Ptr& message )
 {
-    switch ( static_cast< DmMessageNumber >( message->Number ) )
+    switch ( message->Number )
     {
         case SSH_LEGACY_RESERVED_MESSAGE_1:
         case SSH_LEGACY_RESERVED_MESSAGE_2:
@@ -111,9 +138,9 @@ Buffer DmEncodeMessage( const DmMessage::Ptr& message )
 
         // Requests
         case SSH_AGENTC_REQUEST_IDENTITIES:
-
+            return DmEncodeRequestIdentities( std::dynamic_pointer_cast< DmRequestIdentities >( message ) );
         case SSH_AGENTC_SIGN_REQUEST:
-
+            return DmEncodeSignRequest( std::dynamic_pointer_cast< DmSignRequest >( message ) );
 
         case SSH_AGENTC_ADD_IDENTITY:
         case SSH_AGENTC_REMOVE_IDENTITY:

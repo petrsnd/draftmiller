@@ -5,7 +5,6 @@
 
 #include "UnitTestSuite.h"
 
-using namespace std;
 using namespace Magenta;
 
 // StringUtils.h

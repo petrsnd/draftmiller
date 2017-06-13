@@ -10,6 +10,13 @@ DraftMiller::Ptr DraftMiller::Instance()
     return instance;
 }
 
+bool DraftMiller::Register( const DmMessageNumber number, const DraftMiller::MessageHandler& handler )
+{
+    // TODO: Log handler shadowing another?
+    m_handlerRegistry[ number ] = handler;
+    return true;
+}
+
 Buffer DraftMiller::HandleMessage( Buffer& buffer )
 {
     try

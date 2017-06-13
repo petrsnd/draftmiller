@@ -36,7 +36,9 @@ add_subdirectory( common )
 add_subdirectory( draftmiller )
 
 enable_testing()
+
 add_test( NAME TestDataTypes COMMAND testdatatypes )
 add_test( NAME TestDataBuffer COMMAND testdatabuffer )
 add_test( NAME TestStringUtils COMMAND teststringutils )
 
+add_test( NAME TestRequestIdentities COMMAND testrequestidentities )

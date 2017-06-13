@@ -7,12 +7,14 @@
 #endif
 
 #include "Exception.h"
+#include "StringUtils.h"
 
 #include <string>
 #include <vector>
 #include <iostream>
 
 #include <functional>
+
 
 namespace Magenta {
 
@@ -79,6 +81,10 @@ public:
         catch ( NotImplementedException& e )
         {
             return UnitTestResult( false, e.What() );
+        }
+        catch ( Exception& e )
+        {
+            return UnitTestResult( false, SC() << "Unexpected exception: " << e.What() );
         }
         catch ( ... )
         {
