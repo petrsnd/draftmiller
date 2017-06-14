@@ -59,7 +59,7 @@ enum DmMessageNumber : uint8_t
     SSH_AGENT_EXTENSION_FAILURE                 = 28,
 
     // Known Extensions
-
+    // May never support...
 
     // Unknown Message
     SSH_UNKNOWN_MESSAGE                         = 0
@@ -215,6 +215,7 @@ struct DmRemoveIdentity : public DmMessage
     DmRemoveIdentity() :
         DmMessage( SSH_AGENTC_REMOVE_IDENTITY )
     {}
+    Buffer KeyBlob;
     typedef std::shared_ptr< DmRemoveIdentity > Ptr;
 };
 
@@ -243,6 +244,8 @@ struct DmAddSmartCardKey : public DmMessage
     DmAddSmartCardKey() :
         DmMessage( SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED )
     {}
+    Buffer Id;
+    std::string Pin;
     typedef std::shared_ptr< DmAddSmartCardKey > Ptr;
 };
 
@@ -251,6 +254,8 @@ struct DmRemoveSmartCardKey : public DmMessage
     DmRemoveSmartCardKey() :
         DmMessage( SSH_AGENTC_REMOVE_SMARTCARD_KEY )
     {}
+    Buffer Id;
+    std::string Pin;
     typedef std::shared_ptr< DmRemoveSmartCardKey > Ptr;
 };
 
@@ -259,6 +264,7 @@ struct DmLock : public DmMessage
     DmLock() :
         DmMessage( SSH_AGENTC_LOCK )
     {}
+    std::string PassPhrase;
     typedef std::shared_ptr< DmLock > Ptr;
 };
 
@@ -267,6 +273,7 @@ struct DmUnlock : public DmMessage
     DmUnlock() :
         DmMessage( SSH_AGENTC_UNLOCK )
     {}
+    std::string PassPhrase;
     typedef std::shared_ptr< DmUnlock > Ptr;
 };
 
@@ -275,6 +282,9 @@ struct DmAddSmartCardKeyConstrained : public DmMessage
     DmAddSmartCardKeyConstrained() :
         DmMessage( SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED )
     {}
+    Buffer Id;
+    std::string Pin;
+    // TODO: Constraints
     typedef std::shared_ptr< DmAddSmartCardKeyConstrained > Ptr;
 };
 

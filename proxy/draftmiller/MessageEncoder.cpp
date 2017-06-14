@@ -29,7 +29,7 @@ static Buffer DmEncodePacket( const DataBuffer& db )
 }
 
 // Encode helpers
-static void DmEncodeKeyT( DataBuffer& db, const std::string& type, const DmKeyUnion& key )
+static void DmEncodeKeyUnion( DataBuffer &db, const std::string &type, const DmKeyUnion &key )
 {
     if ( type == "ssh-dss" )
     {
@@ -101,7 +101,7 @@ static Buffer DmEncodeAddIdentity( const DmAddIdentity::Ptr& addIdentity )
     DataBuffer db;
     db.WriteUInt8( addIdentity->Number );
     DmEncodeString( db, addIdentity->Type );
-    DmEncodeKeyT( db, addIdentity->Type, addIdentity->Key );
+    DmEncodeKeyUnion( db, addIdentity->Type, addIdentity->Key );
     DmEncodeString( db, addIdentity->Comment );
     return DmEncodePacket( db );
 }
@@ -110,14 +110,26 @@ static Buffer DmEncodeAddIdentityConstrained( const DmAddIdentityConstrained::Pt
 {
     if ( addIdentityConstrained == nullptr )
     {
-        throw DmEncodeException( "Add identity structure cannot be null" );
+        throw DmEncodeException( "Add identity constrained structure cannot be null" );
     }
     DataBuffer db;
     db.WriteUInt8( addIdentityConstrained->Number );
     DmEncodeString( db, addIdentityConstrained->Type );
-    DmEncodeKeyT( db, addIdentityConstrained->Type, addIdentityConstrained->Key );
+    DmEncodeKeyUnion( db, addIdentityConstrained->Type, addIdentityConstrained->Key );
     DmEncodeString( db, addIdentityConstrained->Comment );
     // TODO: constraints
+    return DmEncodePacket( db );
+}
+
+static Buffer DmEncodeRemoveIdentity( const DmRemoveIdentity::Ptr& removeIdentity )
+{
+    if ( removeIdentity == nullptr )
+    {
+        throw DmEncodeException( "Remove identity structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( removeIdentity->Number );
+    DmEncodeString( db, removeIdentity->KeyBlob );
     return DmEncodePacket( db );
 }
 
@@ -126,19 +138,79 @@ static Buffer DmEncodeRemoveAllIdentities( const DmRemoveAllIdentities::Ptr& rem
     return DmEncodeSimpleMessage( removeAllIdentities, "Remove all identities" );
 }
 
+static Buffer DmEncodeAddSmartCardKey( const DmAddSmartCardKey::Ptr& addSmartCardKey )
+{
+    if ( addSmartCardKey == nullptr )
+    {
+        throw DmEncodeException( "Add smart card key structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( addSmartCardKey->Number );
+    DmEncodeString( db, addSmartCardKey->Id );
+    DmEncodeString( db, addSmartCardKey->Pin );
+    return DmEncodePacket( db );
+}
+
+static Buffer DmEncodeAddSmartCardKeyConstrained( const DmAddSmartCardKeyConstrained::Ptr& addSmartCardKeyConstrained )
+{
+    if ( addSmartCardKeyConstrained == nullptr )
+    {
+        throw DmEncodeException( "Add smart card key constrained structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( addSmartCardKeyConstrained->Number );
+    DmEncodeString( db, addSmartCardKeyConstrained->Id );
+    DmEncodeString( db, addSmartCardKeyConstrained->Pin );
+    // TODO: Constraints
+    return DmEncodePacket( db );
+}
+
+static Buffer DmEncodeRemoveSmartCardKey( const DmRemoveSmartCardKey::Ptr& removeSmartCardKey )
+{
+    if ( removeSmartCardKey == nullptr )
+    {
+        throw DmEncodeException( "Remove smart card key structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( removeSmartCardKey->Number );
+    DmEncodeString( db, removeSmartCardKey->Id );
+    DmEncodeString( db, removeSmartCardKey->Pin );
+    return DmEncodePacket( db );
+}
+
+static Buffer DmEncodeLock( const DmLock::Ptr& lock )
+{
+    if ( lock == nullptr )
+    {
+        throw DmEncodeException( "Lock structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( lock->Number );
+    DmEncodeString( db, lock->PassPhrase );
+    return DmEncodePacket( db );
+}
+
+static Buffer DmEncodeUnlock( const DmUnlock::Ptr& unlock )
+{
+    if ( unlock == nullptr )
+    {
+        throw DmEncodeException( "Unlock structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( unlock->Number );
+    DmEncodeString( db, unlock->PassPhrase );
+    return DmEncodePacket( db );
+}
+
 // Encode responses
 static Buffer DmEncodeFailure()
 {
-    DataBuffer db;
-    db.WriteUInt8( SSH_AGENT_FAILURE );
-    return DmEncodePacket( db );
+    return DmEncodeSimpleMessage( std::make_shared< DmMessage >( SSH_AGENT_FAILURE ), "Failure" );
 }
 
 static Buffer DmEncodeSuccess()
 {
-    DataBuffer db;
-    db.WriteUInt8( SSH_AGENT_SUCCESS );
-    return DmEncodePacket( db );
+    return DmEncodeSimpleMessage( std::make_shared< DmMessage >( SSH_AGENT_SUCCESS ), "Success" );
 }
 
 static Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitiesAnswer )
@@ -178,13 +250,7 @@ static Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse )
 
 static Buffer DmEncodeExtensionFailure( const DmExtensionFailure::Ptr& extensionFailure )
 {
-    if ( extensionFailure == nullptr )
-    {
-        throw DmEncodeException( "Extension failure structure cannot be null" );
-    }
-    DataBuffer db;
-    db.WriteUInt8( extensionFailure->Number );
-    return DmEncodePacket( db );
+    return DmEncodeSimpleMessage( extensionFailure, "Extension failure" );
 }
 
 
@@ -213,19 +279,21 @@ Buffer DmEncodeMessage( const DmMessage::Ptr& message )
         case SSH_AGENTC_ADD_IDENTITY:
             return DmEncodeAddIdentity( std::dynamic_pointer_cast< DmAddIdentity >( message ) );
         case SSH_AGENTC_REMOVE_IDENTITY:
-            throw DmEncodeException(
-                SC() << "Request message not currently supported for encoding (" << message->Number << ")" );
+            return DmEncodeRemoveIdentity( std::dynamic_pointer_cast< DmRemoveIdentity >( message ) );
         case SSH_AGENTC_REMOVE_ALL_IDENTITIES:
             return DmEncodeRemoveAllIdentities( std::dynamic_pointer_cast< DmRemoveAllIdentities >( message ) );
         case SSH_AGENTC_ADD_SMARTCARD_KEY:
+            return DmEncodeAddSmartCardKey( std::dynamic_pointer_cast< DmAddSmartCardKey >( message ) );
         case SSH_AGENTC_REMOVE_SMARTCARD_KEY:
+            return DmEncodeRemoveSmartCardKey( std::dynamic_pointer_cast< DmRemoveSmartCardKey >( message ) );
         case SSH_AGENTC_LOCK:
+            return DmEncodeLock( std::dynamic_pointer_cast< DmLock >( message ) );
         case SSH_AGENTC_UNLOCK:
-            throw DmEncodeException(
-                SC() << "Request message not currently supported for encoding (" << message->Number << ")" );
+            return DmEncodeUnlock( std::dynamic_pointer_cast< DmUnlock >( message ) );
         case SSH_AGENTC_ADD_ID_CONSTRAINED:
             return DmEncodeAddIdentityConstrained( std::dynamic_pointer_cast< DmAddIdentityConstrained >( message ) );
         case SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED:
+            return DmEncodeAddSmartCardKeyConstrained( std::dynamic_pointer_cast< DmAddSmartCardKeyConstrained >( message ) );
         case SSH_AGENTC_EXTENSION:
             throw DmEncodeException(
                 SC() << "Request message not currently supported for encoding (" << message->Number << ")" );
