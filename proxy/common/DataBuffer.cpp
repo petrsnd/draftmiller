@@ -341,7 +341,7 @@ Buffer DataBuffer::ReadBuffer( const size_t len )
                 SC() << "Request to read Buffer (" << len << ") larger than DataBuffer (" << Size() << ")" );
     }
     ret.resize( len );
-    memcpy( &ret[0], &m_data[0], len );
+    memcpy( &ret[0], &m_data[m_frontPos], len );
     m_frontPos += len;
     return ret;
 }

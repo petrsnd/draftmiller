@@ -951,6 +951,12 @@ static void TestDataBufferReadWriteBuffer()
     ASSERT_TRUE( buf.Empty() );
     arr = buf.ReadBuffer();
     ASSERT_TRUE( arr.empty() );
+    buf.Clear();
+    buf.WriteBuffer( data1 );
+    buf.ReadUInt32();
+    arr = buf.ReadBuffer( 4 );
+    Buffer expected3 = { 0x05, 0x06, 0x07, 0x08 };
+    ASSERT_ARE_EQUAL( arr, expected3 );
 }
 
 
