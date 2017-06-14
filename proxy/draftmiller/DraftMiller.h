@@ -94,6 +94,78 @@ struct DmKey
     typedef std::vector< DmKey > List;
 };
 
+struct DmDsa
+{
+    DmDsa()
+    {}
+    DmDsa( const DmDsa& dsa ) :
+        P( dsa.P ), Q( dsa.Q ), G( dsa.G ), Y( dsa.Y ), X( dsa.X )
+    {}
+    ~DmDsa()
+    {}
+    Buffer P;
+    Buffer Q;
+    Buffer G;
+    Buffer Y;
+    Buffer X;
+};
+
+struct DmEcdsa
+{
+    DmEcdsa()
+    {}
+    DmEcdsa( const DmEcdsa& ecdsa ) :
+        EcdsaCurveName( ecdsa.EcdsaCurveName ), Q( ecdsa.Q ), D( ecdsa.D )
+    {}
+    ~DmEcdsa()
+    {}
+    std::string EcdsaCurveName;
+    Buffer Q;
+    Buffer D;
+};
+
+struct DmEd25519
+{
+    DmEd25519()
+    {}
+    DmEd25519( const DmEd25519& ed25519 ) :
+        EncA( ed25519.EncA ), KEncA( ed25519.KEncA )
+    {}
+    ~DmEd25519()
+    {}
+    Buffer EncA;
+    Buffer KEncA;
+};
+
+struct DmRsa
+{
+    DmRsa()
+    {}
+    DmRsa( const DmRsa& rsa ) :
+        N( rsa.N ), E( rsa.E ), D( rsa.D ), Iqmp( rsa.Iqmp ), P( rsa.P ), Q( rsa.Q )
+    {}
+    ~DmRsa()
+    {}
+    Buffer N;
+    Buffer E;
+    Buffer D;
+    Buffer Iqmp;
+    Buffer P;
+    Buffer Q;
+};
+
+union DmKeyUnion
+{
+    DmKeyUnion()
+    {}
+    ~DmKeyUnion()
+    {}
+    DmDsa Dsa;
+    DmEcdsa Ecdsa;
+    DmEd25519 Ed25519;
+    DmRsa Rsa;
+};
+
 // Request Messages
 struct DmMessage
 {
@@ -130,6 +202,11 @@ struct DmAddIdentity : public DmMessage
     DmAddIdentity() :
         DmMessage( SSH_AGENTC_ADD_IDENTITY )
     {}
+    ~DmAddIdentity()
+    {}
+    std::string Type;
+    DmKeyUnion Key;
+    std::string Comment;
     typedef std::shared_ptr< DmAddIdentity > Ptr;
 };
 
@@ -154,6 +231,10 @@ struct DmAddIdentityConstrained : public DmMessage
     DmAddIdentityConstrained() :
         DmMessage( SSH_AGENTC_ADD_ID_CONSTRAINED )
     {}
+    std::string Type;
+    DmKeyUnion Key;
+    std::string Comment;
+    // TODO: Constraints
     typedef std::shared_ptr< DmAddIdentityConstrained > Ptr;
 };
 

@@ -7,12 +7,14 @@
 
 namespace Magenta {
 
+// Parse primitives
 static Buffer DmParseString( DataBuffer& db )
 {
     uint32_t size = db.ReadUInt32();
     return db.ReadBuffer( size );
 }
 
+// Parse requests
 static DmMessage::Ptr DmParseSignRequest( DataBuffer& db )
 {
     DmSignRequest::Ptr signRequest = std::make_shared< DmSignRequest >();
@@ -21,6 +23,9 @@ static DmMessage::Ptr DmParseSignRequest( DataBuffer& db )
     signRequest->Flags = db.ReadUInt32();
     return signRequest;
 }
+
+// Parse responses
+
 
 static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t size )
 {
@@ -46,7 +51,9 @@ static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t siz
         case SSH_AGENT_SUCCESS:
             return std::make_shared< DmSuccess >();
         case SSH_AGENT_IDENTITIES_ANSWER:
+
         case SSH_AGENT_SIGN_RESPONSE:
+
         case SSH_AGENT_EXTENSION_FAILURE:
             throw DmParseException(
                 SC() << "Response message not currently supported for parsing (" << messageNumber << ")" );

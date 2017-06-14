@@ -28,6 +28,104 @@ static Buffer DmEncodePacket( const DataBuffer& db )
     return packet;
 }
 
+// Encode helpers
+static void DmEncodeKeyT( DataBuffer& db, const std::string& type, const DmKeyUnion& key )
+{
+    if ( type == "ssh-dss" )
+    {
+        DmEncodeString( db, key.Dsa.P );
+        DmEncodeString( db, key.Dsa.Q );
+        DmEncodeString( db, key.Dsa.G );
+        DmEncodeString( db, key.Dsa.Y );
+        DmEncodeString( db, key.Dsa.X );
+    }
+    else if ( type == "ssh-ed25519" )
+    {
+        DmEncodeString( db, key.Ed25519.EncA );
+        DmEncodeString( db, key.Ed25519.KEncA );
+    }
+    else if ( type == "ssh-rsa" )
+    {
+        DmEncodeString( db, key.Rsa.N );
+        DmEncodeString( db, key.Rsa.E );
+        DmEncodeString( db, key.Rsa.D );
+        DmEncodeString( db, key.Rsa.Iqmp );
+        DmEncodeString( db, key.Rsa.P );
+        DmEncodeString( db, key.Rsa.Q );
+    }
+    else // Assume ECDSA -- check for curve name
+    {
+        DmEncodeString( db, key.Ecdsa.EcdsaCurveName );
+        DmEncodeString( db, key.Ecdsa.Q );
+        DmEncodeString( db, key.Ecdsa.D );
+    }
+}
+
+static Buffer DmEncodeSimpleMessage( const DmMessage::Ptr& message, const std::string& name )
+{
+    if ( message == nullptr )
+    {
+        throw DmEncodeException( SC() << " structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( message->Number );
+    return DmEncodePacket( db );
+}
+
+// Encode requests
+static Buffer DmEncodeRequestIdentities( const DmRequestIdentities::Ptr& requestIdentities )
+{
+    return DmEncodeSimpleMessage( requestIdentities, "Request identities" );
+}
+
+static Buffer DmEncodeSignRequest( const DmSignRequest::Ptr& signRequest )
+{
+    if ( signRequest == nullptr )
+    {
+        throw DmEncodeException( "Sign request structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( signRequest->Number );
+    DmEncodeString( db, signRequest->KeyBlob );
+    DmEncodeString( db, signRequest->Data );
+    db.WriteUInt32( signRequest->Flags );
+    return DmEncodePacket( db );
+}
+
+static Buffer DmEncodeAddIdentity( const DmAddIdentity::Ptr& addIdentity )
+{
+    if ( addIdentity == nullptr )
+    {
+        throw DmEncodeException( "Add identity structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( addIdentity->Number );
+    DmEncodeString( db, addIdentity->Type );
+    DmEncodeKeyT( db, addIdentity->Type, addIdentity->Key );
+    DmEncodeString( db, addIdentity->Comment );
+    return DmEncodePacket( db );
+}
+
+static Buffer DmEncodeAddIdentityConstrained( const DmAddIdentityConstrained::Ptr& addIdentityConstrained )
+{
+    if ( addIdentityConstrained == nullptr )
+    {
+        throw DmEncodeException( "Add identity structure cannot be null" );
+    }
+    DataBuffer db;
+    db.WriteUInt8( addIdentityConstrained->Number );
+    DmEncodeString( db, addIdentityConstrained->Type );
+    DmEncodeKeyT( db, addIdentityConstrained->Type, addIdentityConstrained->Key );
+    DmEncodeString( db, addIdentityConstrained->Comment );
+    // TODO: constraints
+    return DmEncodePacket( db );
+}
+
+static Buffer DmEncodeRemoveAllIdentities( const DmRemoveAllIdentities::Ptr& removeAllIdentities )
+{
+    return DmEncodeSimpleMessage( removeAllIdentities, "Remove all identities" );
+}
+
 // Encode responses
 static Buffer DmEncodeFailure()
 {
@@ -78,33 +176,17 @@ static Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse )
     return DmEncodePacket( db );
 }
 
-// Encode requests
-static Buffer DmEncodeRequestIdentities( const DmRequestIdentities::Ptr& requestIdentities )
+static Buffer DmEncodeExtensionFailure( const DmExtensionFailure::Ptr& extensionFailure )
 {
-    if ( requestIdentities == nullptr )
+    if ( extensionFailure == nullptr )
     {
-        throw DmEncodeException( "Request identities structure cannot be null" );
+        throw DmEncodeException( "Extension failure structure cannot be null" );
     }
     DataBuffer db;
-    db.WriteUInt8( requestIdentities->Number );
+    db.WriteUInt8( extensionFailure->Number );
     return DmEncodePacket( db );
 }
 
-static Buffer DmEncodeSignRequest( const DmSignRequest::Ptr& signRequest )
-{
-    if ( signRequest == nullptr )
-    {
-        throw DmEncodeException( "Sign request structure cannot be null" );
-    }
-    DataBuffer db;
-    db.WriteUInt8( signRequest->Number );
-    db.WriteUInt32( static_cast< uint32_t >( signRequest->KeyBlob.size() ) );
-    db.WriteBuffer( signRequest->KeyBlob );
-    db.WriteUInt32( static_cast< uint32_t >( signRequest->Data.size() ) );
-    db.WriteBuffer( signRequest->Data );
-    db.WriteUInt32( signRequest->Flags );
-    return DmEncodePacket( db );
-}
 
 Buffer DmEncodeMessage( const DmMessage::Ptr& message )
 {
@@ -123,6 +205,31 @@ Buffer DmEncodeMessage( const DmMessage::Ptr& message )
         case SSH_LEGACY_RESERVED_MESSAGE_24:
             throw DmEncodeException( SC() << "Legacy message not supported (" << message->Number << ")" );
 
+        // Requests
+        case SSH_AGENTC_REQUEST_IDENTITIES:
+            return DmEncodeRequestIdentities( std::dynamic_pointer_cast< DmRequestIdentities >( message ) );
+        case SSH_AGENTC_SIGN_REQUEST:
+            return DmEncodeSignRequest( std::dynamic_pointer_cast< DmSignRequest >( message ) );
+        case SSH_AGENTC_ADD_IDENTITY:
+            return DmEncodeAddIdentity( std::dynamic_pointer_cast< DmAddIdentity >( message ) );
+        case SSH_AGENTC_REMOVE_IDENTITY:
+            throw DmEncodeException(
+                SC() << "Request message not currently supported for encoding (" << message->Number << ")" );
+        case SSH_AGENTC_REMOVE_ALL_IDENTITIES:
+            return DmEncodeRemoveAllIdentities( std::dynamic_pointer_cast< DmRemoveAllIdentities >( message ) );
+        case SSH_AGENTC_ADD_SMARTCARD_KEY:
+        case SSH_AGENTC_REMOVE_SMARTCARD_KEY:
+        case SSH_AGENTC_LOCK:
+        case SSH_AGENTC_UNLOCK:
+            throw DmEncodeException(
+                SC() << "Request message not currently supported for encoding (" << message->Number << ")" );
+        case SSH_AGENTC_ADD_ID_CONSTRAINED:
+            return DmEncodeAddIdentityConstrained( std::dynamic_pointer_cast< DmAddIdentityConstrained >( message ) );
+        case SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED:
+        case SSH_AGENTC_EXTENSION:
+            throw DmEncodeException(
+                SC() << "Request message not currently supported for encoding (" << message->Number << ")" );
+
         // Responses
         case SSH_AGENT_FAILURE:
             return DmEncodeFailure();
@@ -133,30 +240,8 @@ Buffer DmEncodeMessage( const DmMessage::Ptr& message )
         case SSH_AGENT_SIGN_RESPONSE:
             return DmEncodeSignResponse( std::dynamic_pointer_cast< DmSignResponse >( message ) );
         case SSH_AGENT_EXTENSION_FAILURE:
-            throw DmEncodeException(
-                SC() << "Response message not currently supported for encoding (" << message->Number << ")" );
+            return DmEncodeExtensionFailure( std::dynamic_pointer_cast< DmExtensionFailure >( message ) );
 
-        // Requests
-        case SSH_AGENTC_REQUEST_IDENTITIES:
-            return DmEncodeRequestIdentities( std::dynamic_pointer_cast< DmRequestIdentities >( message ) );
-        case SSH_AGENTC_SIGN_REQUEST:
-            return DmEncodeSignRequest( std::dynamic_pointer_cast< DmSignRequest >( message ) );
-
-        case SSH_AGENTC_ADD_IDENTITY:
-        case SSH_AGENTC_REMOVE_IDENTITY:
-            throw DmEncodeException(
-                SC() << "Request message not currently supported for encoding (" << message->Number << ")" );
-        case SSH_AGENTC_REMOVE_ALL_IDENTITIES:
-
-        case SSH_AGENTC_ADD_SMARTCARD_KEY:
-        case SSH_AGENTC_REMOVE_SMARTCARD_KEY:
-        case SSH_AGENTC_LOCK:
-        case SSH_AGENTC_UNLOCK:
-        case SSH_AGENTC_ADD_ID_CONSTRAINED:
-        case SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED:
-        case SSH_AGENTC_EXTENSION:
-            throw DmEncodeException(
-                SC() << "Request message not currently supported for encoding (" << message->Number << ")" );
         default:
             DmUnknownMessage::Ptr unknownMessage = std::dynamic_pointer_cast< DmUnknownMessage >( message );
             DataBuffer db;
