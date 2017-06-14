@@ -20,6 +20,39 @@ static std::string DmParseString( DataBuffer& db )
     return db.ReadString( size );
 }
 
+// Parser helpers
+static void DmParseKeyUnion( DataBuffer& db, DmKeyUnion& key, const std::string& type )
+{
+    if ( type == "ssh-dss" )
+    {
+        key.Dsa.P = DmParseBuffer( db );
+        key.Dsa.Q = DmParseBuffer( db );
+        key.Dsa.G = DmParseBuffer( db );
+        key.Dsa.Y = DmParseBuffer( db );
+        key.Dsa.X = DmParseBuffer( db );
+    }
+    else if ( type == "ssh-ed25519" )
+    {
+        key.Ed25519.EncA = DmParseBuffer( db  );
+        key.Ed25519.KEncA = DmParseBuffer( db );
+    }
+    else if ( type == "ssh-rsa" )
+    {
+        key.Rsa.N = DmParseBuffer( db );
+        key.Rsa.E = DmParseBuffer( db );
+        key.Rsa.D = DmParseBuffer( db );
+        key.Rsa.Iqmp = DmParseBuffer( db );
+        key.Rsa.P = DmParseBuffer( db );
+        key.Rsa.Q = DmParseBuffer( db );
+    }
+    else // Assume ECDSA -- check for curve name
+    {
+        key.Ecdsa.EcdsaCurveName = DmParseString( db );
+        key.Ecdsa.Q = DmParseBuffer( db );
+        key.Ecdsa.D = DmParseBuffer( db );
+    }
+}
+
 // Parse requests
 static DmMessage::Ptr DmParseSignRequest( DataBuffer& db )
 {
@@ -28,6 +61,71 @@ static DmMessage::Ptr DmParseSignRequest( DataBuffer& db )
     signRequest->Data = DmParseBuffer( db );
     signRequest->Flags = db.ReadUInt32();
     return signRequest;
+}
+
+static DmMessage::Ptr DmParseAddIdentity( DataBuffer& db )
+{
+    DmAddIdentity::Ptr addIdentity = std::make_shared< DmAddIdentity >();
+    addIdentity->Type = DmParseString( db );
+    DmParseKeyUnion( db, addIdentity->Key, addIdentity->Type );
+    addIdentity->Comment = DmParseString( db );
+    return addIdentity;
+}
+
+static DmMessage::Ptr DmParseAddIdentityConstrained( DataBuffer& db )
+{
+    DmAddIdentityConstrained::Ptr addIdentityConstrained = std::make_shared< DmAddIdentityConstrained >();
+    addIdentityConstrained->Type = DmParseString( db );
+    DmParseKeyUnion( db, addIdentityConstrained->Key, addIdentityConstrained->Type );
+    addIdentityConstrained->Comment = DmParseString( db );
+    // TODO: constraints
+    return addIdentityConstrained;
+}
+
+static DmMessage::Ptr DmParseRemoveIdentity( DataBuffer& db )
+{
+    DmRemoveIdentity::Ptr removeIdentity = std::make_shared< DmRemoveIdentity >();
+    removeIdentity->KeyBlob = DmParseBuffer( db );
+    return removeIdentity;
+}
+
+static DmMessage::Ptr DmParseAddSmartCardKey( DataBuffer& db )
+{
+    DmAddSmartCardKey::Ptr addSmartCardKey = std::make_shared< DmAddSmartCardKey >();
+    addSmartCardKey->Id = DmParseBuffer( db );
+    addSmartCardKey->Pin = DmParseString( db );
+    return addSmartCardKey;
+}
+
+static DmMessage::Ptr DmParseAddSmartCardKeyConstrained( DataBuffer& db )
+{
+    DmAddSmartCardKeyConstrained::Ptr addSmartCardKeyConstrained = std::make_shared< DmAddSmartCardKeyConstrained >();
+    addSmartCardKeyConstrained->Id = DmParseBuffer( db );
+    addSmartCardKeyConstrained->Pin = DmParseString( db );
+    // TODO: Constraints
+    return addSmartCardKeyConstrained;
+}
+
+static DmMessage::Ptr DmParseRemoveSmartCardKey( DataBuffer& db )
+{
+    DmRemoveSmartCardKey::Ptr removeSmartCardKey = std::make_shared< DmRemoveSmartCardKey >();
+    removeSmartCardKey->Id = DmParseBuffer( db );
+    removeSmartCardKey->Pin = DmParseString( db );
+    return removeSmartCardKey;
+}
+
+static DmMessage::Ptr DmParseLock( DataBuffer& db )
+{
+    DmLock::Ptr lock = std::make_shared< DmLock >();
+    lock->PassPhrase = DmParseString( db );
+    return lock;
+}
+
+static DmMessage::Ptr DmParseUnlock( DataBuffer& db )
+{
+    DmUnlock::Ptr unlock = std::make_shared< DmUnlock >();
+    unlock->PassPhrase = DmParseString( db );
+    return unlock;
 }
 
 // Parse responses
@@ -77,17 +175,23 @@ static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t siz
         case SSH_AGENTC_SIGN_REQUEST:
             return DmParseSignRequest( db );
         case SSH_AGENTC_ADD_IDENTITY:
+            return DmParseAddIdentity( db );
         case SSH_AGENTC_REMOVE_IDENTITY:
-            throw DmParseException(
-                SC() << "Request message not currently supported for parsing (" << messageNumber << ")" );
+            return DmParseRemoveIdentity( db );
         case SSH_AGENTC_REMOVE_ALL_IDENTITIES:
             return std::make_shared< DmRemoveAllIdentities >();
         case SSH_AGENTC_ADD_SMARTCARD_KEY:
+            return DmParseAddSmartCardKey( db );
         case SSH_AGENTC_REMOVE_SMARTCARD_KEY:
+            return DmParseRemoveSmartCardKey( db );
         case SSH_AGENTC_LOCK:
+            return DmParseLock( db );
         case SSH_AGENTC_UNLOCK:
+            return DmParseUnlock( db );
         case SSH_AGENTC_ADD_ID_CONSTRAINED:
+            return DmParseAddIdentityConstrained( db );
         case SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED:
+            return DmParseAddSmartCardKeyConstrained( db );
         case SSH_AGENTC_EXTENSION:
             throw DmParseException(
                 SC() << "Request message not currently supported for parsing (" << messageNumber << ")" );

@@ -33,8 +33,9 @@ Buffer DraftMiller::HandleMessage( Buffer& buffer )
     }
     catch ( DmIncompletePacketException& ex )
     {
-        // TODO: Log?
-        return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
+        // Fragmented packet, need to continue reading...
+        // TODO: Figure out what the continuation mechanism will be here
+        throw;
     }
     catch ( Exception& ex )
     {
