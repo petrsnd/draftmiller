@@ -8,23 +8,49 @@
 namespace Magenta {
 
 // Parse primitives
-static Buffer DmParseString( DataBuffer& db )
+static Buffer DmParseBuffer( DataBuffer& db )
 {
     uint32_t size = db.ReadUInt32();
     return db.ReadBuffer( size );
+}
+
+static std::string DmParseString( DataBuffer& db )
+{
+    uint32_t size = db.ReadUInt32();
+    return db.ReadString( size );
 }
 
 // Parse requests
 static DmMessage::Ptr DmParseSignRequest( DataBuffer& db )
 {
     DmSignRequest::Ptr signRequest = std::make_shared< DmSignRequest >();
-    signRequest->KeyBlob = DmParseString( db );
-    signRequest->Data = DmParseString( db );
+    signRequest->KeyBlob = DmParseBuffer( db );
+    signRequest->Data = DmParseBuffer( db );
     signRequest->Flags = db.ReadUInt32();
     return signRequest;
 }
 
 // Parse responses
+static DmMessage::Ptr DmParseIdentitiesAnswer( DataBuffer& db )
+{
+    DmIdentitiesAnswer::Ptr identitiesAnswer = std::make_shared< DmIdentitiesAnswer >();
+    identitiesAnswer->NumberKeys = db.ReadUInt32();
+    for ( auto i = 0; i < identitiesAnswer->NumberKeys; i++ )
+    {
+        DmKey key;
+        key.KeyBlob = DmParseBuffer( db );
+        key.Comment = DmParseString( db );
+        identitiesAnswer->Keys.push_back( key );
+    }
+    return identitiesAnswer;
+}
+
+static DmMessage::Ptr DmParseSignResponse( DataBuffer& db )
+{
+    DmSignResponse::Ptr signResponse = std::make_shared< DmSignResponse >();
+    signResponse->Signature = DmParseBuffer( db );
+    return signResponse;
+}
 
 
 static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t size )
@@ -45,25 +71,11 @@ static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t siz
         case SSH_LEGACY_RESERVED_MESSAGE_24:
             throw DmParseException( SC() << "Legacy message not supported (" << messageNumber << ")" );
 
-        // Responses
-        case SSH_AGENT_FAILURE:
-            return std::make_shared< DmFailure >();
-        case SSH_AGENT_SUCCESS:
-            return std::make_shared< DmSuccess >();
-        case SSH_AGENT_IDENTITIES_ANSWER:
-
-        case SSH_AGENT_SIGN_RESPONSE:
-
-        case SSH_AGENT_EXTENSION_FAILURE:
-            throw DmParseException(
-                SC() << "Response message not currently supported for parsing (" << messageNumber << ")" );
-
         // Requests
         case SSH_AGENTC_REQUEST_IDENTITIES:
             return std::make_shared< DmRequestIdentities >();
         case SSH_AGENTC_SIGN_REQUEST:
             return DmParseSignRequest( db );
-
         case SSH_AGENTC_ADD_IDENTITY:
         case SSH_AGENTC_REMOVE_IDENTITY:
             throw DmParseException(
@@ -79,10 +91,24 @@ static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t siz
         case SSH_AGENTC_EXTENSION:
             throw DmParseException(
                 SC() << "Request message not currently supported for parsing (" << messageNumber << ")" );
+
+        // Responses
+        case SSH_AGENT_FAILURE:
+            return std::make_shared< DmFailure >();
+        case SSH_AGENT_SUCCESS:
+            return std::make_shared< DmSuccess >();
+        case SSH_AGENT_IDENTITIES_ANSWER:
+            return DmParseIdentitiesAnswer( db );
+        case SSH_AGENT_SIGN_RESPONSE:
+            return DmParseSignResponse( db );
+        case SSH_AGENT_EXTENSION_FAILURE:
+            throw DmParseException(
+                SC() << "Response message not currently supported for parsing (" << messageNumber << ")" );
+
         default:
             DmUnknownMessage::Ptr unknownMessage = std::make_shared< DmUnknownMessage >(
                 static_cast< DmMessageNumber >( messageNumber ) );
-            unknownMessage->Payload = db.ReadBuffer( size );
+            unknownMessage->Payload = db.ReadBuffer();
             return unknownMessage;
     }
 }

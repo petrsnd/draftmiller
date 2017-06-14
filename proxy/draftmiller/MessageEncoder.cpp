@@ -14,7 +14,7 @@ static void DmEncodeString( DataBuffer& db, const std::string& str )
     db.WriteString( str, false );
 }
 
-static void DmEncodeString( DataBuffer& db, const Buffer& buf )
+static void DmEncodeBuffer( DataBuffer &db, const Buffer &buf )
 {
     db.WriteUInt32( static_cast< uint32_t >( buf.size() ) );
     db.WriteBuffer( buf );
@@ -33,31 +33,31 @@ static void DmEncodeKeyUnion( DataBuffer &db, const std::string &type, const DmK
 {
     if ( type == "ssh-dss" )
     {
-        DmEncodeString( db, key.Dsa.P );
-        DmEncodeString( db, key.Dsa.Q );
-        DmEncodeString( db, key.Dsa.G );
-        DmEncodeString( db, key.Dsa.Y );
-        DmEncodeString( db, key.Dsa.X );
+        DmEncodeBuffer( db, key.Dsa.P );
+        DmEncodeBuffer( db, key.Dsa.Q );
+        DmEncodeBuffer( db, key.Dsa.G );
+        DmEncodeBuffer( db, key.Dsa.Y );
+        DmEncodeBuffer( db, key.Dsa.X );
     }
     else if ( type == "ssh-ed25519" )
     {
-        DmEncodeString( db, key.Ed25519.EncA );
-        DmEncodeString( db, key.Ed25519.KEncA );
+        DmEncodeBuffer( db, key.Ed25519.EncA );
+        DmEncodeBuffer( db, key.Ed25519.KEncA );
     }
     else if ( type == "ssh-rsa" )
     {
-        DmEncodeString( db, key.Rsa.N );
-        DmEncodeString( db, key.Rsa.E );
-        DmEncodeString( db, key.Rsa.D );
-        DmEncodeString( db, key.Rsa.Iqmp );
-        DmEncodeString( db, key.Rsa.P );
-        DmEncodeString( db, key.Rsa.Q );
+        DmEncodeBuffer( db, key.Rsa.N );
+        DmEncodeBuffer( db, key.Rsa.E );
+        DmEncodeBuffer( db, key.Rsa.D );
+        DmEncodeBuffer( db, key.Rsa.Iqmp );
+        DmEncodeBuffer( db, key.Rsa.P );
+        DmEncodeBuffer( db, key.Rsa.Q );
     }
     else // Assume ECDSA -- check for curve name
     {
         DmEncodeString( db, key.Ecdsa.EcdsaCurveName );
-        DmEncodeString( db, key.Ecdsa.Q );
-        DmEncodeString( db, key.Ecdsa.D );
+        DmEncodeBuffer( db, key.Ecdsa.Q );
+        DmEncodeBuffer( db, key.Ecdsa.D );
     }
 }
 
@@ -86,8 +86,8 @@ static Buffer DmEncodeSignRequest( const DmSignRequest::Ptr& signRequest )
     }
     DataBuffer db;
     db.WriteUInt8( signRequest->Number );
-    DmEncodeString( db, signRequest->KeyBlob );
-    DmEncodeString( db, signRequest->Data );
+    DmEncodeBuffer( db, signRequest->KeyBlob );
+    DmEncodeBuffer( db, signRequest->Data );
     db.WriteUInt32( signRequest->Flags );
     return DmEncodePacket( db );
 }
@@ -129,7 +129,7 @@ static Buffer DmEncodeRemoveIdentity( const DmRemoveIdentity::Ptr& removeIdentit
     }
     DataBuffer db;
     db.WriteUInt8( removeIdentity->Number );
-    DmEncodeString( db, removeIdentity->KeyBlob );
+    DmEncodeBuffer( db, removeIdentity->KeyBlob );
     return DmEncodePacket( db );
 }
 
@@ -146,7 +146,7 @@ static Buffer DmEncodeAddSmartCardKey( const DmAddSmartCardKey::Ptr& addSmartCar
     }
     DataBuffer db;
     db.WriteUInt8( addSmartCardKey->Number );
-    DmEncodeString( db, addSmartCardKey->Id );
+    DmEncodeBuffer( db, addSmartCardKey->Id );
     DmEncodeString( db, addSmartCardKey->Pin );
     return DmEncodePacket( db );
 }
@@ -159,7 +159,7 @@ static Buffer DmEncodeAddSmartCardKeyConstrained( const DmAddSmartCardKeyConstra
     }
     DataBuffer db;
     db.WriteUInt8( addSmartCardKeyConstrained->Number );
-    DmEncodeString( db, addSmartCardKeyConstrained->Id );
+    DmEncodeBuffer( db, addSmartCardKeyConstrained->Id );
     DmEncodeString( db, addSmartCardKeyConstrained->Pin );
     // TODO: Constraints
     return DmEncodePacket( db );
@@ -173,7 +173,7 @@ static Buffer DmEncodeRemoveSmartCardKey( const DmRemoveSmartCardKey::Ptr& remov
     }
     DataBuffer db;
     db.WriteUInt8( removeSmartCardKey->Number );
-    DmEncodeString( db, removeSmartCardKey->Id );
+    DmEncodeBuffer( db, removeSmartCardKey->Id );
     DmEncodeString( db, removeSmartCardKey->Pin );
     return DmEncodePacket( db );
 }
@@ -230,7 +230,7 @@ static Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitie
     db.WriteUInt32( identitiesAnswer->NumberKeys );
     for ( auto i = 0; i < identitiesAnswer->NumberKeys; i++ )
     {
-        DmEncodeString( db, identitiesAnswer->Keys[i].KeyBlob );
+        DmEncodeBuffer( db, identitiesAnswer->Keys[ i ].KeyBlob );
         DmEncodeString( db, identitiesAnswer->Keys[i].Comment );
     }
     return DmEncodePacket( db );
@@ -244,7 +244,7 @@ static Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse )
     }
     DataBuffer db;
     db.WriteUInt8( signResponse->Number );
-    DmEncodeString( db, signResponse->Signature );
+    DmEncodeBuffer( db, signResponse->Signature );
     return DmEncodePacket( db );
 }
 

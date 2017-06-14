@@ -33,7 +33,8 @@ Buffer DraftMiller::HandleMessage( Buffer& buffer )
     }
     catch ( DmIncompletePacketException& ex )
     {
-        throw;
+        // TODO: Log?
+        return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
     }
     catch ( Exception& ex )
     {
