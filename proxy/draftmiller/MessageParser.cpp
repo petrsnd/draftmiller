@@ -156,7 +156,7 @@ static DmMessage::Ptr DmParseSignResponse( DataBuffer& db )
 }
 
 
-static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db, const uint32_t size )
+static DmMessage::Ptr DmParseMessageInternal( DataBuffer& db )
 {
     uint8_t messageNumber = db.ReadUInt8();
     switch ( static_cast< DmMessageNumber >( messageNumber ) )
@@ -237,7 +237,7 @@ DmMessage::Ptr DmParseMessage( Buffer& buffer )
         }
         // Create a new DataBuffer to ensure only the correct number of bytes are parsed
         DataBuffer dbMessage( db.ReadBuffer( packetSize ) );
-        DmMessage::Ptr parsedMessage = DmParseMessageInternal( dbMessage, packetSize );
+        DmMessage::Ptr parsedMessage = DmParseMessageInternal( dbMessage );
         bytesRemoved = sizeof( uint32_t ) + packetSize;
         buffer.erase( buffer.begin(), buffer.begin() + bytesRemoved );
         return parsedMessage;

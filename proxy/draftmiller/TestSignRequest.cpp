@@ -157,14 +157,6 @@ static void TestRealData()
     ASSERT_FALSE( signResponse == nullptr );
     Buffer signRequestEncoded = DmEncodeMessage( signRequest );
     Buffer signResponseEncoded = DmEncodeMessage( signResponse );
-    size_t szEn = signRequestEncoded.size();
-    size_t szEx = expectedSignRequest.size();
-    //ASSERT_ARE_EQUAL( szEn, szEx );
-    for ( int i = 0; i < szEx; i++ )
-    {
-        if ( signRequestEncoded[i] != expectedSignRequest[i] )
-            int breakhere = 100;
-    }
     ASSERT_ARE_EQUAL( expectedSignRequest, signRequestEncoded );
     ASSERT_ARE_EQUAL( expectedSignResponse, signResponseEncoded );
 }
