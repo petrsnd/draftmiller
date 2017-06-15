@@ -59,7 +59,12 @@ static DmMessage::Ptr DmParseSignRequest( DataBuffer& db )
     DmSignRequest::Ptr signRequest = std::make_shared< DmSignRequest >();
     signRequest->KeyBlob = DmParseBuffer( db );
     signRequest->Data = DmParseBuffer( db );
-    signRequest->Flags = db.ReadUInt32();
+    if ( db.Size() >= 4 )
+    {
+        // I have seen test buffers that just leave this off, so I
+        // check to see if there are any bytes left in the packet
+        signRequest->Flags = db.ReadUInt32();
+    }
     return signRequest;
 }
 
@@ -223,14 +228,16 @@ DmMessage::Ptr DmParseMessage( Buffer& buffer )
     try
     {
         size_t bytesRemoved = 0;
-        DataBuffer db(buffer);
+        DataBuffer db( buffer );
         uint32_t packetSize = db.ReadUInt32();
         if ( db.Size() < packetSize )
         {
             throw DmIncompletePacketException(
                 SC() << "Buffer does not contain enough bytes for packet size: " << packetSize );
         }
-        DmMessage::Ptr parsedMessage = DmParseMessageInternal( db, packetSize );
+        // Create a new DataBuffer to ensure only the correct number of bytes are parsed
+        DataBuffer dbMessage( db.ReadBuffer( packetSize ) );
+        DmMessage::Ptr parsedMessage = DmParseMessageInternal( dbMessage, packetSize );
         bytesRemoved = sizeof( uint32_t ) + packetSize;
         buffer.erase( buffer.begin(), buffer.begin() + bytesRemoved );
         return parsedMessage;

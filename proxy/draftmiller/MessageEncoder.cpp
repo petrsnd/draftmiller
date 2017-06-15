@@ -88,7 +88,12 @@ static Buffer DmEncodeSignRequest( const DmSignRequest::Ptr& signRequest )
     db.WriteUInt8( signRequest->Number );
     DmEncodeBuffer( db, signRequest->KeyBlob );
     DmEncodeBuffer( db, signRequest->Data );
-    db.WriteUInt32( signRequest->Flags );
+    if ( signRequest->Flags != 0 )
+    {
+        // The only implementation I have sample data from leaves this off,
+        // so I'm checking for zero and just not including it if it is empty
+        db.WriteUInt32( signRequest->Flags );
+    }
     return DmEncodePacket( db );
 }
 
