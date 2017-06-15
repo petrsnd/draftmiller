@@ -13,7 +13,10 @@ bool reg = DraftMiller::Instance()->Register( SSH_AGENTC_SIGN_REQUEST,
                                               []( const DmMessage::Ptr& message ) -> DmMessage::Ptr
     {
         ASSERT_ARE_EQUAL( message->Number, SSH_AGENTC_SIGN_REQUEST );
-        // TODO: read response from file
+        auto signRequest = std::dynamic_pointer_cast< DmSignRequest >( message );
+        ASSERT_ARE_EQUAL( signRequest->KeyBlob, Buffer( { 0xba, 0xbe } ) );
+        ASSERT_ARE_EQUAL( signRequest->Data, Buffer( { 0xfe, 0xeb, 0x1e } ) );
+        ASSERT_ARE_EQUAL( signRequest->Flags, 3434 );
         DmSignResponse::Ptr signResponse = std::make_shared< DmSignResponse >();
         signResponse->Signature = { 0x00, 0x01, 0x02, 0x03, 0x04, 0xa0, 0xaf, 0xde, 0xad, 0xbe, 0xef };
         return signResponse;
@@ -135,6 +138,9 @@ static void TestEncodeParseResponse()
 static void TestRequestResponse()
 {
     auto request = std::make_shared< DmSignRequest >();
+    request->KeyBlob = { 0xba, 0xbe };
+    request->Data = { 0xfe, 0xeb, 0x1e };
+    request->Flags = 3434;
     Buffer requestBuffer = DmEncodeMessage( std::dynamic_pointer_cast< DmMessage >( request ) );
     Buffer responseBuffer = DraftMiller::Instance()->HandleMessage( requestBuffer );
     auto message = DmParseMessage( responseBuffer );
