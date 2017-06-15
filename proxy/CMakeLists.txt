@@ -42,3 +42,5 @@ add_test( NAME TestDataBuffer COMMAND testdatabuffer )
 add_test( NAME TestStringUtils COMMAND teststringutils )
 
 add_test( NAME TestRequestIdentities COMMAND testrequestidentities )
+add_test( NAME TestSignRequest COMMAND testsignrequest )
+

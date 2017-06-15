@@ -11,3 +11,6 @@ copy_headers_to_include()
 
 add_executable( testrequestidentities TestRequestIdentities.cpp )
 target_link_libraries( testrequestidentities draftmiller common )
+
+add_executable( testsignrequest TestSignRequest.cpp )
+target_link_libraries( testsignrequest draftmiller common )
