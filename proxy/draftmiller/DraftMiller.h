@@ -416,13 +416,13 @@ public:
     /// @param handler The handler to be called when this message is parsed
     /// @returns A bool only so it can do the static registration
     bool Register( const DmMessageNumber number, const MessageHandler& handler );
-    /// Handle a request message buffer and obtain a response message buffer.
+    /// Handle a request message buffer and obtain a response message buffer
     /// All valid messages will be removed even if a handler is not registered.  They will simply return
     /// a failure message.  If a message cannot be parsed because a complete packet was not found in the
-    /// buffer, an exception will be thrown.  It should be handled.  You should read more data and then
-    /// call this method again.
+    /// buffer, a DmIncompletePacketException will be thrown.  It should be handled.  You should read
+    /// more data and then call this method again.
     /// @param buffer A buffer to be handled, this parameter will be modified as messages are handled
-    /// @throws DmParseException, DmEncodeException
+    /// @throws DmParseException, DmEncodeException, DmIncompletePacketException
     Buffer HandleMessage( Buffer& buffer );
 };
 

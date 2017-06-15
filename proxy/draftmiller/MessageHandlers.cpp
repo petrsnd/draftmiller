@@ -12,7 +12,7 @@ DraftMiller::Ptr DraftMiller::Instance()
 
 bool DraftMiller::Register( const DmMessageNumber number, const DraftMiller::MessageHandler& handler )
 {
-    // TODO: Log handler shadowing another?
+    // TODO: Log? -- handler shadowing another?
     m_handlerRegistry[ number ] = handler;
     return true;
 }
@@ -28,18 +28,17 @@ Buffer DraftMiller::HandleMessage( Buffer& buffer )
             DmMessage::Ptr response = it->second( request );
             return DmEncodeMessage( response );
         }
-        // TODO: Log?
+        // TODO: Log? -- unhandled message
         return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
     }
     catch ( DmIncompletePacketException& ex )
     {
         // Fragmented packet, need to continue reading...
-        // TODO: Figure out what the continuation mechanism will be here
         throw;
     }
     catch ( Exception& ex )
     {
-        // TODO: Log?
+        // TODO: Log? -- unexpected exception log it and return a DmFailure
         return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
     }
 }
