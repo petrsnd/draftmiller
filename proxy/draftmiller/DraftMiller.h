@@ -82,6 +82,9 @@ enum DmSignatureFlags
 // Packet
 struct DmPacket
 {
+    DmPacket() :
+        Length( 0 )
+    {}
     uint32_t Length;
     Buffer Contents;
 };
@@ -189,7 +192,8 @@ struct DmRequestIdentities : public DmMessage
 struct DmSignRequest : public DmMessage
 {
     DmSignRequest() :
-        DmMessage( SSH_AGENTC_SIGN_REQUEST )
+        DmMessage( SSH_AGENTC_SIGN_REQUEST ),
+        Flags( 0 )
     {}
     Buffer KeyBlob;
     Buffer Data;
@@ -316,7 +320,8 @@ struct DmSuccess : public DmMessage
 struct DmIdentitiesAnswer : public DmMessage
 {
     DmIdentitiesAnswer() :
-        DmMessage( SSH_AGENT_IDENTITIES_ANSWER )
+        DmMessage( SSH_AGENT_IDENTITIES_ANSWER ),
+        NumberKeys( 0 )
     {}
     uint32_t NumberKeys;
     DmKey::List Keys;
