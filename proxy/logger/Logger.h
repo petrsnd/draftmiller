@@ -51,8 +51,7 @@ protected:
     LoggerDebugLevel m_debugLevel;
 };
 
-// Initialization and logger creation
-typedef std::function< void() > LoggerInit;
+// Lazy logger creation
 typedef std::function< LoggerBase::Ptr( const LoggerSeverity, const LoggerDebugLevel ) > LoggerCreator;
 
 
@@ -95,49 +94,52 @@ public:
 class LoggerConfig
 {
 public:
-    static void Initialize( const LoggerInit& loggerInit, const LoggerCreator& loggerCreator )
+    typedef std::shared_ptr< LoggerConfig > Ptr;
+private:
+    LoggerConfig()
     {
-        loggerInit();
-        s_loggerCreator = loggerCreator;
+        // default to null logger
+        m_loggerCreator = [] ( const LoggerSeverity severity, const LoggerDebugLevel debugLevel )
+        {
+            return std::make_shared< NullLogger >( severity, debugLevel );
+        };
     }
-    static LoggerImpl CreateLogger(
+public:
+    static LoggerConfig::Ptr Instance()
+    {
+        static LoggerConfig::Ptr instance = LoggerConfig::Ptr( new LoggerConfig );
+        return instance;
+    }
+    void Initialize( const LoggerCreator& loggerCreator )
+    {
+        m_loggerCreator = loggerCreator;
+    }
+    LoggerImpl CreateLogger(
         const LoggerSeverity severity, const LoggerDebugLevel debugLevel = LoggerDebugLevel::LEVEL_0)
     {
-        return LoggerImpl( s_loggerCreator( severity, debugLevel ) );
+        return LoggerImpl( m_loggerCreator( severity, debugLevel ) );
     }
 private:
-    static LoggerCreator s_loggerCreator;
-    friend class DefaultInitializer;
-    struct DefaultInitializer
-    {
-        DefaultInitializer()
-        {
-            s_loggerCreator = [] ( const LoggerSeverity severity, const LoggerDebugLevel debugLevel )
-            {
-                return std::make_shared< NullLogger >( severity, debugLevel );
-            };
-        }
-    };
-    static DefaultInitializer s_defaultInitializer;
+    LoggerCreator m_loggerCreator;
 };
 
 
 // Interface
-#define LOG_EMERG   LoggerConfig::CreateLogger( LoggerSeverity::EMERGENCY )
-#define LOG_ALERT   LoggerConfig::CreateLogger( LoggerSeverity::ALERT )
-#define LOG_CRIT    LoggerConfig::CreateLogger( LoggerSeverity::CRITICAL )
-#define LOG_ERR     LoggerConfig::CreateLogger( LoggerSeverity::ERROR )
-#define LOG_WARN    LoggerConfig::CreateLogger( LoggerSeverity::WARNING )
-#define LOG_NOTICE  LoggerConfig::CreateLogger( LoggerSeverity::NOTICE )
-#define LOG_INFO    LoggerConfig::CreateLogger( LoggerSeverity::INFO )
-#define LOG_DBG1    LoggerConfig::CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_1 )
-#define LOG_DBG2    LoggerConfig::CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_2 )
-#define LOG_DBG3    LoggerConfig::CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_3 )
-#define LOG_DBG4    LoggerConfig::CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_4 )
-#define LOG_DBG5    LoggerConfig::CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_5 )
-#define LOG_DBG6    LoggerConfig::CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_6 )
-#define LOG_DBG7    LoggerConfig::CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_7 )
-#define LOG_DBG8    LoggerConfig::CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_8 )
-#define LOG_DBG9    LoggerConfig::CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_9 )
+#define LOG_EMERG   LoggerConfig::Instance()->CreateLogger( LoggerSeverity::EMERGENCY )
+#define LOG_ALERT   LoggerConfig::Instance()->CreateLogger( LoggerSeverity::ALERT )
+#define LOG_CRIT    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::CRITICAL )
+#define LOG_ERR     LoggerConfig::Instance()->CreateLogger( LoggerSeverity::ERROR )
+#define LOG_WARN    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::WARNING )
+#define LOG_NOTICE  LoggerConfig::Instance()->CreateLogger( LoggerSeverity::NOTICE )
+#define LOG_INFO    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::INFO )
+#define LOG_DBG1    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_1 )
+#define LOG_DBG2    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_2 )
+#define LOG_DBG3    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_3 )
+#define LOG_DBG4    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_4 )
+#define LOG_DBG5    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_5 )
+#define LOG_DBG6    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_6 )
+#define LOG_DBG7    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_7 )
+#define LOG_DBG8    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_8 )
+#define LOG_DBG9    LoggerConfig::Instance()->CreateLogger( LoggerSeverity::DEBUG, LoggerDebugLevel::LEVEL_9 )
 
 } // Magenta

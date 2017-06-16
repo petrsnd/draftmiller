@@ -2,7 +2,8 @@
 
 #include "DraftMiller.h"
 
-#include "UnitTestSuite.h"
+#include <UnitTestSuite.h>
+#include <ConsoleLogger.h>
 
 using namespace Magenta;
 
@@ -169,6 +170,7 @@ static void TestRealData()
 
 int main( int argc, char** argv )
 {
+    RegisterConsoleLogger();
     bool testsAllPassed;
     DECLARE_UNIT_TEST_SUITE( SignRequest )
         ADD_UNIT_TEST( SignRequest, TestEncodeParseRequest );

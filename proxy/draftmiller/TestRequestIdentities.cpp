@@ -2,7 +2,8 @@
 
 #include "DraftMiller.h"
 
-#include "UnitTestSuite.h"
+#include <UnitTestSuite.h>
+#include <ConsoleLogger.h>
 
 using namespace Magenta;
 
@@ -13,7 +14,6 @@ bool reg = DraftMiller::Instance()->Register( SSH_AGENTC_REQUEST_IDENTITIES,
                                               []( const DmMessage::Ptr& message ) -> DmMessage::Ptr
     {
         ASSERT_ARE_EQUAL( message->Number, SSH_AGENTC_REQUEST_IDENTITIES );
-        // TODO: read response from file
         DmIdentitiesAnswer::Ptr identitiesAnswer = std::make_shared< DmIdentitiesAnswer >();
         identitiesAnswer->NumberKeys = 2;
         identitiesAnswer->Keys.push_back( { { 0x00, 0x01, 0x02, 0x03 }, "abcdef" } );
@@ -166,6 +166,7 @@ static void TestRealData()
 
 int main( int argc, char** argv )
 {
+    RegisterConsoleLogger();
     bool testsAllPassed;
     DECLARE_UNIT_TEST_SUITE( RequestIdentities )
         ADD_UNIT_TEST( RequestIdentities, TestEncodeParseRequest );

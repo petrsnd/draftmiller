@@ -2,8 +2,6 @@
 
 #include "ConsoleLogger.h"
 
-#include <iostream>
-
 namespace Magenta {
 
 ConsoleLogger::ConsoleLogger( const LoggerSeverity severity, const LoggerDebugLevel debugLevel ) :
@@ -19,8 +17,7 @@ void ConsoleLogger::Log( const std::string& logMessage )
 
 void RegisterConsoleLogger()
 {
-    LoggerConfig::Initialize(
-        [] () {},
+    LoggerConfig::Instance()->Initialize(
         [] ( const LoggerSeverity severity, const LoggerDebugLevel debugLevel ) -> LoggerBase::Ptr
         {
             return std::make_shared< ConsoleLogger >( severity, debugLevel );

@@ -2,6 +2,8 @@
 
 #include "DraftMiller.h"
 
+#include <Logger.h>
+
 namespace Magenta {
 
 DraftMiller::DraftMiller()
@@ -15,7 +17,7 @@ DraftMiller::Ptr DraftMiller::Instance()
 
 bool DraftMiller::Register( const DmMessageNumber number, const DraftMiller::MessageHandler& handler )
 {
-    // TODO: Log? -- handler shadowing another?
+    LOG_WARN << "Handler was previously registered for message number: " << number;
     m_handlerRegistry[ number ] = handler;
     return true;
 }
@@ -31,18 +33,23 @@ Buffer DraftMiller::HandleMessage( Buffer& buffer )
             DmMessage::Ptr response = it->second( request );
             return DmEncodeMessage( response );
         }
-        // TODO: Log? -- unhandled message
+        LOG_WARN << "Unhandled message for message number: " << request->Number;
         return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
     }
     catch ( const DmIncompletePacketException& ex )
     {
-        // Fragmented packet, need to continue reading...
+        LOG_INFO << "Fragmented packet received, continuing...";
         throw;
     }
     catch ( const Exception& ex )
     {
-        // TODO: Log? -- unexpected exception log it and return a DmFailure
+        LOG_WARN << "Unexpected error: " << ex.What();
+        LOG_WARN << "Returning failure message and continuing...";
         return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
+    }
+    catch ( ... )
+    {
+        LOG_ERR << "Unhandled exception in message handler";
     }
 }
 
