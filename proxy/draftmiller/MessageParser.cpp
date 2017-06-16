@@ -242,7 +242,7 @@ DmMessage::Ptr DmParseMessage( Buffer& buffer )
         buffer.erase( buffer.begin(), buffer.begin() + bytesRemoved );
         return parsedMessage;
     }
-    catch ( Exception& ex )
+    catch ( const Exception& ex )
     {
         throw DmParseException( ex.What() );
     }

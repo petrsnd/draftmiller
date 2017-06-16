@@ -74,15 +74,15 @@ public:
             m_func();
             return UnitTestResult();
         }
-        catch ( UnitTestException& e )
+        catch ( const UnitTestException& e )
         {
             return UnitTestResult( false, e.ErrorMessage() );
         }
-        catch ( NotImplementedException& e )
+        catch ( const NotImplementedException& e )
         {
             return UnitTestResult( false, e.What() );
         }
-        catch ( Exception& e )
+        catch ( const Exception& e )
         {
             return UnitTestResult( false, SC() << "Unexpected exception: " << e.What() );
         }
@@ -155,7 +155,7 @@ protected:
     + std::string( #expr2 ) + " ), i.e. operator!=() returned false" );
 #define ASSERT_THROWS( expr, excptn ) try { expr; \
     throw UnitTestException( "Assertion failed: ( " + std::string( #expr ) + " ) did not throw an exception, expected " \
-    + std::string( #excptn ) ); } catch ( excptn ) {}
+    + std::string( #excptn ) ); } catch ( const excptn ) {}
 
 } // Magenta
 

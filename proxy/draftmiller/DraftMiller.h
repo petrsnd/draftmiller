@@ -2,6 +2,10 @@
 
 // (c) 2017 petrsnd@gmail.com.  All rights reserved.
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <Primitives.h>
 #include <Exception.h>
 
@@ -172,7 +176,7 @@ union DmKeyUnion
 // Request Messages
 struct DmMessage
 {
-    DmMessage(const DmMessageNumber number) :
+    DmMessage( const DmMessageNumber number ) :
         Number( number )
     {}
     virtual ~DmMessage()
@@ -410,6 +414,7 @@ class DraftMiller
 public:
     typedef std::shared_ptr< DraftMiller > Ptr;
 private:
+    DraftMiller();
     typedef std::function< DmMessage::Ptr ( const DmMessage::Ptr& ) > MessageHandler;
     std::map< DmMessageNumber, MessageHandler > m_handlerRegistry;
 public:

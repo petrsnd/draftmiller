@@ -4,9 +4,12 @@
 
 namespace Magenta {
 
+DraftMiller::DraftMiller()
+{}
+
 DraftMiller::Ptr DraftMiller::Instance()
 {
-    static DraftMiller::Ptr instance = std::make_shared< DraftMiller >();
+    static DraftMiller::Ptr instance = DraftMiller::Ptr( new DraftMiller );
     return instance;
 }
 
@@ -31,12 +34,12 @@ Buffer DraftMiller::HandleMessage( Buffer& buffer )
         // TODO: Log? -- unhandled message
         return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
     }
-    catch ( DmIncompletePacketException& ex )
+    catch ( const DmIncompletePacketException& ex )
     {
         // Fragmented packet, need to continue reading...
         throw;
     }
-    catch ( Exception& ex )
+    catch ( const Exception& ex )
     {
         // TODO: Log? -- unexpected exception log it and return a DmFailure
         return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
