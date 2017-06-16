@@ -34,7 +34,6 @@ Buffer DraftMiller::HandleMessage( Buffer& buffer )
             return DmEncodeMessage( response );
         }
         LOG_WARN << "Unhandled message for message number: " << request->Number;
-        return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
     }
     catch ( const DmIncompletePacketException& ex )
     {
@@ -45,12 +44,12 @@ Buffer DraftMiller::HandleMessage( Buffer& buffer )
     {
         LOG_WARN << "Unexpected error: " << ex.What();
         LOG_WARN << "Returning failure message and continuing...";
-        return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
     }
     catch ( ... )
     {
         LOG_ERR << "Unhandled exception in message handler";
     }
+    return DmEncodeMessage( DmMessage::Ptr( new DmFailure ) );
 }
 
 } // Magenta
