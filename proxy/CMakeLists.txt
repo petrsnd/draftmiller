@@ -33,6 +33,7 @@ include( CopyHeadersToInclude )
 include_directories( ${CMAKE_BINARY_DIR}/include )
 
 add_subdirectory( common )
+add_subdirectory( logger )
 add_subdirectory( draftmiller )
 
 enable_testing()
