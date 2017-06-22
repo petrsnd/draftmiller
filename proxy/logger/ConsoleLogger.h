@@ -19,7 +19,6 @@ public:
     virtual void Log( const std::string& logMessage );
 };
 
-void RegisterConsoleLogger();
-void RegisterConsoleLogger( const LoggerDebugLevel& debugThreshold );
+void RegisterConsoleLogger( const LoggerDebugLevel& debugThreshold = LoggerDebugLevel::LEVEL_0 );
 
 } // Magenta
