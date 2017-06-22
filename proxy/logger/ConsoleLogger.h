@@ -15,10 +15,11 @@ namespace Magenta {
 class ConsoleLogger : public LoggerBase
 {
 public:
-    ConsoleLogger( const LoggerSeverity severity, const LoggerDebugLevel debugLevel );
+    ConsoleLogger( const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel );
     virtual void Log( const std::string& logMessage );
 };
 
 void RegisterConsoleLogger();
+void RegisterConsoleLogger( const LoggerDebugLevel& debugThreshold );
 
 } // Magenta

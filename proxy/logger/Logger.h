@@ -39,36 +39,50 @@ class LoggerBase
 {
 public:
     typedef std::shared_ptr< LoggerBase > Ptr;
-    LoggerBase( const LoggerSeverity severity, const LoggerDebugLevel debugLevel ) :
+    LoggerBase( const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel ) :
         m_severity( severity ),
         m_debugLevel( debugLevel )
     {}
     virtual ~LoggerBase()
     {}
     virtual void Log( const std::string& logMessage ) = 0;
+    bool ShouldLog( const LoggerDebugLevel& debugThreshold )
+    {
+        if ( m_severity._to_integral() == LoggerSeverity::DEBUG
+             && m_debugLevel._to_integral() > debugThreshold )
+        {
+            return false;
+        }
+        return true;
+    }
 protected:
     LoggerSeverity m_severity;
     LoggerDebugLevel m_debugLevel;
 };
 
 // Lazy logger creation
-typedef std::function< LoggerBase::Ptr( const LoggerSeverity, const LoggerDebugLevel ) > LoggerCreator;
+typedef std::function< LoggerBase::Ptr( const LoggerSeverity&, const LoggerDebugLevel& ) > LoggerCreator;
 
 
 class LoggerImpl
 {
 public:
-    LoggerImpl( const LoggerBase::Ptr& logger ) :
-        m_logger( logger )
+    LoggerImpl( const LoggerBase::Ptr& logger, const LoggerDebugLevel& debugThreshold ) :
+        m_logger( logger ),
+        m_debugThreshold( debugThreshold )
     {}
     LoggerImpl( const LoggerImpl& loggerImpl ) :
-        m_logger( loggerImpl.m_logger )
+        m_logger( loggerImpl.m_logger ),
+        m_debugThreshold( LoggerDebugLevel::LEVEL_0 )
     {
         m_ss << loggerImpl.m_ss.str();
     }
     ~LoggerImpl()
     {
-        m_logger->Log( m_ss.str() );
+        if ( m_logger->ShouldLog( m_debugThreshold ) )
+        {
+            m_logger->Log( m_ss.str() );
+        }
     }
     template< typename T >
     LoggerImpl& operator<<(T value)
@@ -78,13 +92,14 @@ public:
     }
 private:
     LoggerBase::Ptr m_logger;
+    LoggerDebugLevel m_debugThreshold;
     std::stringstream m_ss;
 };
 
 class NullLogger : public LoggerBase
 {
 public:
-    NullLogger( const LoggerSeverity severity, const LoggerDebugLevel debugLevel ) :
+    NullLogger( const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel ) :
         LoggerBase( severity, debugLevel )
     {}
     virtual void Log( const std::string& logMessage )
@@ -96,10 +111,11 @@ class LoggerConfig
 public:
     typedef std::shared_ptr< LoggerConfig > Ptr;
 private:
-    LoggerConfig()
+    LoggerConfig() :
+        m_debugThreshold( LoggerDebugLevel::LEVEL_0 )
     {
         // default to null logger
-        m_loggerCreator = [] ( const LoggerSeverity severity, const LoggerDebugLevel debugLevel )
+        m_loggerCreator = [] ( const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel )
         {
             return std::make_shared< NullLogger >( severity, debugLevel );
         };
@@ -113,14 +129,21 @@ public:
     void Initialize( const LoggerCreator& loggerCreator )
     {
         m_loggerCreator = loggerCreator;
+        m_debugThreshold = LoggerDebugLevel::LEVEL_0;
+    }
+    void Initialize( const LoggerCreator& loggerCreator, const LoggerDebugLevel& debugThreshold )
+    {
+        m_loggerCreator = loggerCreator;
+        m_debugThreshold = debugThreshold;
     }
     LoggerImpl CreateLogger(
-        const LoggerSeverity severity, const LoggerDebugLevel debugLevel = LoggerDebugLevel::LEVEL_0)
+        const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel = LoggerDebugLevel::LEVEL_0 )
     {
-        return LoggerImpl( m_loggerCreator( severity, debugLevel ) );
+        return LoggerImpl( m_loggerCreator( severity, debugLevel ), m_debugThreshold );
     }
 private:
     LoggerCreator m_loggerCreator;
+    LoggerDebugLevel m_debugThreshold;
 };
 
 

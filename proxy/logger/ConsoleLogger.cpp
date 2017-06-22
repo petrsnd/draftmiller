@@ -4,7 +4,7 @@
 
 namespace Magenta {
 
-ConsoleLogger::ConsoleLogger( const LoggerSeverity severity, const LoggerDebugLevel debugLevel ) :
+ConsoleLogger::ConsoleLogger( const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel ) :
     LoggerBase( severity, debugLevel )
 {}
 void ConsoleLogger::Log( const std::string& logMessage )
@@ -22,6 +22,15 @@ void RegisterConsoleLogger()
         {
             return std::make_shared< ConsoleLogger >( severity, debugLevel );
         } );
+}
+
+void RegisterConsoleLogger( const LoggerDebugLevel& debugThreshold )
+{
+    LoggerConfig::Instance()->Initialize(
+        [] ( const LoggerSeverity severity, const LoggerDebugLevel debugLevel ) -> LoggerBase::Ptr
+        {
+            return std::make_shared< ConsoleLogger >( severity, debugLevel );
+        }, debugThreshold );
 }
 
 } // Magenta

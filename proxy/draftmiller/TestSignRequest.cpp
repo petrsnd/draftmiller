@@ -170,7 +170,7 @@ static void TestRealData()
 
 int main( int argc, char** argv )
 {
-    RegisterConsoleLogger();
+    RegisterConsoleLogger( LoggerDebugLevel::LEVEL_9 );
     bool testsAllPassed;
     DECLARE_UNIT_TEST_SUITE( SignRequest )
         ADD_UNIT_TEST( SignRequest, TestEncodeParseRequest );
