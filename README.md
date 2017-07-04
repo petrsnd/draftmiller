@@ -13,7 +13,7 @@ On macOs and Linux, we use a Unix Makefiles build system.  A Bash script has bee
 configure the build system via CMake, compile the code via make, and execute the unit tests.
 
 ```Bash
-$ ./build.sh -f
+$ ./build_proxy.sh -f
 ```
 
 ### Windows
@@ -25,5 +25,5 @@ modify the appropriate CMakeLists.txt file rather than the generated project fil
 classes or code files to the project.
 
 ```Powershell
-> .\build.ps1
+> .\build_proxy.ps1
 ```
