@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <functional>
 #include <memory>
 #include <map>
 

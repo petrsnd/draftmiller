@@ -2,6 +2,9 @@
 
 #include "StringUtils.h"
 
+#include <algorithm>
+#include <functional>
+
 namespace Magenta {
 
 struct EqualToNoCaseChar : std::binary_function< char, char, bool >
