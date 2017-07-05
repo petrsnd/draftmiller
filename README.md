@@ -25,5 +25,5 @@ modify the appropriate CMakeLists.txt file rather than the generated project fil
 classes or code files to the project.
 
 ```Powershell
-> .\build_proxy.ps1
+> .\build_proxy.ps1 -Force
 ```
