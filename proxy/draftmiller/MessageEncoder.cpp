@@ -233,7 +233,7 @@ static Buffer DmEncodeIdentitiesAnswer( const DmIdentitiesAnswer::Ptr& identitie
     DataBuffer db;
     db.WriteUInt8( identitiesAnswer->Number );
     db.WriteUInt32( identitiesAnswer->NumberKeys );
-    for ( auto i = 0; i < identitiesAnswer->NumberKeys; i++ )
+    for ( uint32_t i = 0; i < identitiesAnswer->NumberKeys; i++ )
     {
         DmEncodeBuffer( db, identitiesAnswer->Keys[i].KeyBlob );
         DmEncodeString( db, identitiesAnswer->Keys[i].Comment );

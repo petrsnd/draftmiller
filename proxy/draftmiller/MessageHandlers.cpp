@@ -35,7 +35,7 @@ Buffer DraftMiller::HandleMessage( Buffer& buffer )
         }
         LOG_WARN << "Unhandled message for message number: " << request->Number;
     }
-    catch ( const DmIncompletePacketException& ex )
+    catch ( const DmIncompletePacketException )
     {
         LOG_INFO << "Fragmented packet received, continuing...";
         throw;
