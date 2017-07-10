@@ -326,10 +326,13 @@ void DataBuffer::WriteULong( const unsigned long ul )
 }
 Buffer DataBuffer::ReadBuffer()
 {
-    Buffer ret;
-    ret.resize( m_data.size() - m_frontPos );
-    memcpy( &ret[0], &m_data[m_frontPos], m_data.size() - m_frontPos );
-    m_frontPos += ( m_data.size() - m_frontPos );
+	Buffer ret;
+	ret.resize(m_data.size() - m_frontPos);
+	if (ret.size() > 0)
+	{
+		memcpy(&ret[0], &m_data[m_frontPos], m_data.size() - m_frontPos);
+		m_frontPos += (m_data.size() - m_frontPos);
+	}    
     return ret;
 }
 Buffer DataBuffer::ReadBuffer( const size_t len )
