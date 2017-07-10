@@ -15,7 +15,7 @@ function Find-Tool
         [Parameter(Mandatory=$true)]
         [string]$Command
     )
-    Test-Command $Command | Select-Object -ExpandProperty Definition
+    Get-Command $Command | Select-Object -ExpandProperty Definition
 }
 
 function Install-Prerequisites
