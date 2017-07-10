@@ -847,7 +847,7 @@ static void TestDataBufferReadWriteUCharArray()
 {
     DataBuffer buf;
     ASSERT_TRUE( buf.Empty() );
-    unsigned char data[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
+    unsigned char data[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x00 };
     buf.WriteUCharArray( data, false );
     ASSERT_FALSE( buf.Empty() );
     ASSERT_ARE_EQUAL( buf.Size(), 7 );
