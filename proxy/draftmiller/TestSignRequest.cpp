@@ -19,7 +19,7 @@ bool reg = DraftMiller::Instance()->Register( SSH_AGENTC_SIGN_REQUEST,
         ASSERT_ARE_EQUAL( signRequest->Data, Buffer( { 0xfe, 0xeb, 0x1e } ) );
         ASSERT_ARE_EQUAL( signRequest->Flags, 3434 );
         DmSignResponse::Ptr signResponse = std::make_shared< DmSignResponse >();
-        signResponse->Signature = { 0x00, 0x01, 0x02, 0x03, 0x04, 0xa0, 0xaf, 0xde, 0xad, 0xbe, 0xef };
+		signResponse->Signature = { "ecdsa-25519", { 0x00, 0x01, 0x02, 0x03, 0x04, 0xa0, 0xaf, 0xde, 0xad, 0xbe, 0xef } };
         return signResponse;
     } );
 
@@ -128,12 +128,13 @@ static void TestEncodeParseRequest()
 static void TestEncodeParseResponse()
 {
     auto response = std::make_shared< DmSignResponse >();
-    response->Signature = { 0x20, 0x21, 0x22, 0x23 };
+	response->Signature = { "ecdsa-25519", { 0x20, 0x21, 0x22, 0x23 } };
     Buffer responseEncoded = DmEncodeMessage( response );
     auto responseParsed = DmParseMessage( responseEncoded );
     ASSERT_FALSE( std::dynamic_pointer_cast< DmSignResponse >( responseParsed ) == nullptr );
-    ASSERT_ARE_EQUAL( response->Number, responseParsed->Number );
-    ASSERT_ARE_EQUAL( response->Signature, Buffer( { 0x20, 0x21, 0x22, 0x23 } ) );
+	ASSERT_ARE_EQUAL(response->Number, responseParsed->Number);
+	ASSERT_ARE_EQUAL(response->Signature.Algorithm, "ecdsa-25519");
+	ASSERT_ARE_EQUAL(response->Signature.SignatureBlob, Buffer({ 0x20, 0x21, 0x22, 0x23 } ));
 }
 
 static void TestRequestResponse()
@@ -149,9 +150,9 @@ static void TestRequestResponse()
         throw UnitTestException( "DraftMiller return SSH_AGENT_FAILURE" );
     auto response = std::dynamic_pointer_cast< DmSignResponse >( message );
     ASSERT_FALSE( response == nullptr );
-    ASSERT_ARE_EQUAL( response->Number, SSH_AGENT_SIGN_RESPONSE );
-    ASSERT_ARE_EQUAL( response->Signature,
-                      Buffer( { 0x00, 0x01, 0x02, 0x03, 0x04, 0xa0, 0xaf, 0xde, 0xad, 0xbe, 0xef } ) );
+    ASSERT_ARE_EQUAL( response->Number, SSH_AGENT_SIGN_RESPONSE );	
+	ASSERT_ARE_EQUAL(response->Signature.Algorithm, "ecdsa-25519");
+    ASSERT_ARE_EQUAL( response->Signature.SignatureBlob, Buffer( { 0x00, 0x01, 0x02, 0x03, 0x04, 0xa0, 0xaf, 0xde, 0xad, 0xbe, 0xef } ) );
 }
 
 static void TestRealData()
@@ -159,7 +160,7 @@ static void TestRealData()
     Buffer expectedSignRequest( s_realSignRequest );
     Buffer expectedSignResponse( s_realSignResponse );
     auto signRequest = DmParseMessage( s_realSignRequest );
-    auto signResponse = DmParseMessage( s_realSignResponse );
+    auto signResponse = std::dynamic_pointer_cast<DmSignResponse>(DmParseMessage(s_realSignResponse));
     ASSERT_FALSE( signRequest == nullptr );
     ASSERT_FALSE( signResponse == nullptr );
     Buffer signRequestEncoded = DmEncodeMessage( signRequest );

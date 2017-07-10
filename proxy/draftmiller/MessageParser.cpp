@@ -53,6 +53,13 @@ static void DmParseKeyUnion( DataBuffer& db, DmKeyUnion& key, const std::string&
     }
 }
 
+static void DmParseSignature(DataBuffer& db, DmSignature& signature)
+{
+	db.ReadInt32(); // Ignore the encapsulating buffer length
+	signature.Algorithm = DmParseString(db);
+	signature.SignatureBlob = DmParseBuffer(db);
+}
+
 // Parse requests
 static DmMessage::Ptr DmParseSignRequest( DataBuffer& db )
 {
@@ -138,7 +145,7 @@ static DmMessage::Ptr DmParseIdentitiesAnswer( DataBuffer& db )
 {
     DmIdentitiesAnswer::Ptr identitiesAnswer = std::make_shared< DmIdentitiesAnswer >();
     identitiesAnswer->NumberKeys = db.ReadUInt32();
-    for ( auto i = 0; i < identitiesAnswer->NumberKeys; i++ )
+    for ( uint32_t i = 0; i < identitiesAnswer->NumberKeys; i++ )
     {
         DmKey key;
         key.KeyBlob = DmParseBuffer( db );
@@ -151,7 +158,7 @@ static DmMessage::Ptr DmParseIdentitiesAnswer( DataBuffer& db )
 static DmMessage::Ptr DmParseSignResponse( DataBuffer& db )
 {
     DmSignResponse::Ptr signResponse = std::make_shared< DmSignResponse >();
-    signResponse->Signature = DmParseBuffer( db );
+	DmParseSignature(db, signResponse->Signature);
     return signResponse;
 }
 

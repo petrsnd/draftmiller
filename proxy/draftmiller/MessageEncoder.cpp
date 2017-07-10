@@ -61,6 +61,14 @@ static void DmEncodeKeyUnion( DataBuffer &db, const std::string &type, const DmK
     }
 }
 
+static void DmEncodeSignature(DataBuffer &db, const DmSignature& signature)
+{
+	DataBuffer signatureBlob;
+	DmEncodeString(signatureBlob, signature.Algorithm);
+	DmEncodeBuffer(signatureBlob, signature.SignatureBlob);
+	DmEncodeBuffer(db, signatureBlob);
+}
+
 static Buffer DmEncodeSimpleMessage( const DmMessage::Ptr& message, const std::string& name )
 {
     if ( message == nullptr )
@@ -249,7 +257,7 @@ static Buffer DmEncodeSignResponse( const DmSignResponse::Ptr& signResponse )
     }
     DataBuffer db;
     db.WriteUInt8( signResponse->Number );
-    DmEncodeBuffer( db, signResponse->Signature );
+	DmEncodeSignature(db, signResponse->Signature );
     return DmEncodePacket( db );
 }
 

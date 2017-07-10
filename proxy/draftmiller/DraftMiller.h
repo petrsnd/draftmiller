@@ -174,6 +174,12 @@ union DmKeyUnion
     DmRsa Rsa;
 };
 
+struct DmSignature
+{
+	std::string Algorithm;
+	Buffer SignatureBlob;
+};
+
 // Request Messages
 struct DmMessage
 {
@@ -338,7 +344,7 @@ struct DmSignResponse : public DmMessage
     DmSignResponse() :
         DmMessage( SSH_AGENT_SIGN_RESPONSE )
     {}
-    Buffer Signature;
+	DmSignature Signature;
     typedef std::shared_ptr< DmSignResponse > Ptr;
 };
 
