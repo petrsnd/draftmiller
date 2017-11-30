@@ -59,19 +59,19 @@ set_version()
 }
 configure()
 {
-    if [ ! -f "$SCRIPTDIR/src/Build/CMakeCache.txt" ]; then
+    if [ ! -f "$SCRIPTDIR/Build/CMakeCache.txt" ]; then
         set -e
-        rm -rf "$SCRIPTDIR/src/Build"
-        mkdir -p "$SCRIPTDIR/src/Build"
-        cd "$SCRIPTDIR/src/Build"
-        cmake ../ -G "Unix Makefiles"
+        rm -rf "$SCRIPTDIR/Build"
+        mkdir -p "$SCRIPTDIR/Build"
+        cd "$SCRIPTDIR/Build"
+        cmake ../src -G "Unix Makefiles"
         set +e
     fi
 }
 build()
 {
     set -e
-    cd "$SCRIPTDIR/src/Build"
+    cd "$SCRIPTDIR/Build"
     make
     if [ $? -eq 0 ]; then
         echo "Build succeeded -- Artifacts at $SCRIPTDIR/Build/"
@@ -95,7 +95,7 @@ build()
 package()
 {
     set -e
-    echo "TODO:"
+    echo "TODO: Packaging ..."
     set +e
 }
 print_usage()
