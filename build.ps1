@@ -6,7 +6,7 @@ Param(
 
 $ErrorActionPreference = "Stop"
 
-$WorkingDirectory="$PSScriptRoot\proxy\Build"
+$WorkingDirectory="$PSScriptRoot\src\Build"
 $ENV:Path = $ENV:Path + ";$($Env:ProgramFiles)\CMake\bin"
 
 function Find-Tool
