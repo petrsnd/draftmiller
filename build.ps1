@@ -6,7 +6,7 @@ Param(
 
 $ErrorActionPreference = "Stop"
 
-$WorkingDirectory="$PSScriptRoot\proxy\Build"
+$WorkingDirectory="$PSScriptRoot\Build"
 $ENV:Path = $ENV:Path + ";$($Env:ProgramFiles)\CMake\bin"
 
 function Find-Tool
@@ -66,7 +66,7 @@ function Start-Configure
         Set-Location "$WorkingDirectory"
         # TODO: Detect and support latest Visual Studio that is installed here
         # Right now we are just hard-coded to VS 2017
-        cmake.exe ../ -G "Visual Studio 15 2017 Win64"
+        cmake.exe ../src -G "Visual Studio 15 2017 Win64"
     }
 }
 
