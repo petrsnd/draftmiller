@@ -36,10 +36,6 @@ add_subdirectory( common )
 add_subdirectory( logger )
 add_subdirectory( draftmiller )
 
-if ( "${OPERATINGSYSTEM}" STREQUAL "WINDOWS" )
-    add_subdirectory( windows )
-endif ()
-
 enable_testing()
 
 add_test( NAME TestDataTypes COMMAND testdatatypes )
