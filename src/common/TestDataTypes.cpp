@@ -5,7 +5,7 @@
 
 #include "UnitTestSuite.h"
 
-using namespace Magenta;
+using namespace DraftMiller;
 
 // DataTypes.h
 static void TestBoolToString()

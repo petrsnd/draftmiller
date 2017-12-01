@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <functional>
 
-namespace Magenta {
+namespace DraftMiller {
 
 struct EqualToNoCaseChar : std::binary_function< char, char, bool >
 {

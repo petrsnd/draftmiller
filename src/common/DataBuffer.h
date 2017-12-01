@@ -24,7 +24,7 @@
 #define _UINT64_T 1
 #endif
 
-namespace Magenta {
+namespace DraftMiller {
 
 class DataBufferException : public Exception
 {

@@ -8,7 +8,7 @@
 
 #include <vector>
 
-namespace Magenta {
+namespace DraftMiller {
 
 typedef std::vector< unsigned char > Buffer;
 

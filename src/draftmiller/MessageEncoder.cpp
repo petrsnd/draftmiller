@@ -1,11 +1,11 @@
 // (c) 2017 petrsnd@gmail.com.  All rights reserved.
 
-#include "DraftMiller.h"
+#include "DraftMillerContext.h"
 
 #include <DataBuffer.h>
 #include <StringUtils.h>
 
-namespace Magenta {
+namespace DraftMiller {
 
 // Encode primitives
 static void DmEncodeString( DataBuffer& db, const std::string& str )

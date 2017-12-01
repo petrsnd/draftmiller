@@ -4,7 +4,7 @@
 
 #include "StringUtils.h"
 
-namespace Magenta {
+namespace DraftMiller {
 
 TypeConversionException::TypeConversionException( const std::string& from,
                                                   const std::string& to,

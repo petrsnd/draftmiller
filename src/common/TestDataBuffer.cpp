@@ -4,7 +4,7 @@
 
 #include "UnitTestSuite.h"
 
-using namespace Magenta;
+using namespace DraftMiller;
 
 // DataBuffer.h
 static void TestDataBufferConstructFromUnsignedCharArray()

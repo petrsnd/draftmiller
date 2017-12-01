@@ -13,7 +13,7 @@
 #include <vector>
 #include <set>
 
-namespace Magenta {
+namespace DraftMiller {
 
 // Types
 typedef std::vector< char* > CharArrayList;

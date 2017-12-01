@@ -17,7 +17,7 @@
 #include <memory>
 #include <map>
 
-namespace Magenta {
+namespace DraftMiller {
 
 // Definitions
 enum DmMessageNumber : uint8_t
@@ -416,18 +416,18 @@ Buffer DmEncodeMessage( const DmMessage::Ptr& message );
 /// for that request message.  After the registered handler provides the response, this class will encode
 /// the response buffer that may be returned to the client.  You must register handlers for any messages
 /// that you would like to support in your agent.
-class DraftMiller
+class DraftMillerContext
 {
 public:
-    typedef std::shared_ptr< DraftMiller > Ptr;
+    typedef std::shared_ptr< DraftMillerContext > Ptr;
 private:
-    DraftMiller();
+    DraftMillerContext();
     typedef std::function< DmMessage::Ptr ( const DmMessage::Ptr& ) > MessageHandler;
     std::map< DmMessageNumber, MessageHandler > m_handlerRegistry;
 public:
     /// Obtain an instance of the singleton
     /// @returns A singleton instance of the draft miller implementation
-    static DraftMiller::Ptr Instance();
+    static DraftMillerContext::Ptr Instance();
     /// Register a handler for a particular message type
     /// @param number The number of the message type to register
     /// @param handler The handler to be called when this message is parsed

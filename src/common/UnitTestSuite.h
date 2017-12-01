@@ -16,7 +16,7 @@
 #include <functional>
 
 
-namespace Magenta {
+namespace DraftMiller {
 
 class UnitTestException
 {

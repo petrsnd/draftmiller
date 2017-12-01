@@ -9,7 +9,7 @@
 #include <string>
 #include <sstream>
 
-namespace Magenta {
+namespace DraftMiller {
 
 BETTER_ENUM( LoggerSeverity, char,
     EMERGENCY = 0,
