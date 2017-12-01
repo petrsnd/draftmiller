@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <syslog.h>
 
-namespace Magenta {
+namespace DraftMiller {
 
 static int ConvertToSyslogSeverity( const LoggerSeverity& severity )
 {

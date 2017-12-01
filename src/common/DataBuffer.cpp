@@ -3,7 +3,7 @@
 #include "DataBuffer.h"
 #include "StringUtils.h"
 
-namespace Magenta {
+namespace DraftMiller {
 
 void DataBuffer::InitExtractorAndAppender()
 {
@@ -21,13 +21,13 @@ void DataBuffer::InitExtractorAndAppender()
 #else
     if ( m_endianness == BigEndian )
     {
-        m_extractor = std::bind( &Magenta::DataBuffer::ByteSwapExtractInteger, this, std::placeholders::_1, std::placeholders::_2 );
-        m_appender = std::bind( &Magenta::DataBuffer::ByteSwapAppendInteger, this, std::placeholders::_1, std::placeholders::_2 );
+        m_extractor = std::bind( &DraftMiller::DataBuffer::ByteSwapExtractInteger, this, std::placeholders::_1, std::placeholders::_2 );
+        m_appender = std::bind( &DraftMiller::DataBuffer::ByteSwapAppendInteger, this, std::placeholders::_1, std::placeholders::_2 );
     }
     else
     {
-        m_extractor = std::bind( &Magenta::DataBuffer::NormalExtractInteger, this, std::placeholders::_1, std::placeholders::_2 );
-        m_appender = std::bind( &Magenta::DataBuffer::NormalAppendInteger, this, std::placeholders::_1, std::placeholders::_2 );
+        m_extractor = std::bind( &DraftMiller::DataBuffer::NormalExtractInteger, this, std::placeholders::_1, std::placeholders::_2 );
+        m_appender = std::bind( &DraftMiller::DataBuffer::NormalAppendInteger, this, std::placeholders::_1, std::placeholders::_2 );
     }
 #endif
 }

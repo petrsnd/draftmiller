@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace Magenta {
+namespace DraftMiller {
 
 class IException
 {

@@ -1,17 +1,17 @@
 // (c) 2017 petrsnd@gmail.com.  All rights reserved.
 
-#include "DraftMiller.h"
+#include "DraftMillerContext.h"
 
 #include <UnitTestSuite.h>
 #include <ConsoleLogger.h>
 
-using namespace Magenta;
+using namespace DraftMiller;
 
 // Anonymous namespace for registrations
 namespace {
 
-bool reg = DraftMiller::Instance()->Register( SSH_AGENTC_SIGN_REQUEST,
-                                              []( const DmMessage::Ptr& message ) -> DmMessage::Ptr
+bool reg = DraftMillerContext::Instance()->Register( SSH_AGENTC_SIGN_REQUEST,
+                                                     []( const DmMessage::Ptr& message ) -> DmMessage::Ptr
     {
         ASSERT_ARE_EQUAL( message->Number, SSH_AGENTC_SIGN_REQUEST );
         auto signRequest = std::dynamic_pointer_cast< DmSignRequest >( message );
@@ -144,10 +144,10 @@ static void TestRequestResponse()
     request->Data = { 0xfe, 0xeb, 0x1e };
     request->Flags = 3434;
     Buffer requestBuffer = DmEncodeMessage( std::dynamic_pointer_cast< DmMessage >( request ) );
-    Buffer responseBuffer = DraftMiller::Instance()->HandleMessage( requestBuffer );
+    Buffer responseBuffer = DraftMillerContext::Instance()->HandleMessage( requestBuffer );
     auto message = DmParseMessage( responseBuffer );
     if ( message->Number == SSH_AGENT_FAILURE )
-        throw UnitTestException( "DraftMiller return SSH_AGENT_FAILURE" );
+        throw UnitTestException( "DraftMillerContext return SSH_AGENT_FAILURE" );
     auto response = std::dynamic_pointer_cast< DmSignResponse >( message );
     ASSERT_FALSE( response == nullptr );
     ASSERT_ARE_EQUAL( response->Number, SSH_AGENT_SIGN_RESPONSE );	

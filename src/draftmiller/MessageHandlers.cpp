@@ -1,28 +1,28 @@
 // (c) 2017 petrsnd@gmail.com.  All rights reserved.
 
-#include "DraftMiller.h"
+#include "DraftMillerContext.h"
 
 #include <Logger.h>
 
-namespace Magenta {
+namespace DraftMiller {
 
-DraftMiller::DraftMiller()
+DraftMillerContext::DraftMillerContext()
 {}
 
-DraftMiller::Ptr DraftMiller::Instance()
+DraftMillerContext::Ptr DraftMillerContext::Instance()
 {
-    static DraftMiller::Ptr instance = DraftMiller::Ptr( new DraftMiller );
+    static DraftMillerContext::Ptr instance = DraftMillerContext::Ptr( new DraftMillerContext );
     return instance;
 }
 
-bool DraftMiller::Register( const DmMessageNumber number, const DraftMiller::MessageHandler& handler )
+bool DraftMillerContext::Register( const DmMessageNumber number, const DraftMillerContext::MessageHandler& handler )
 {
     LOG_WARN << "Handler was previously registered for message number: " << number;
     m_handlerRegistry[ number ] = handler;
     return true;
 }
 
-Buffer DraftMiller::HandleMessage( Buffer& buffer )
+Buffer DraftMillerContext::HandleMessage( Buffer& buffer )
 {
     try
     {

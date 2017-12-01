@@ -2,7 +2,7 @@
 
 #include "ConsoleLogger.h"
 
-namespace Magenta {
+namespace DraftMiller {
 
 ConsoleLogger::ConsoleLogger( const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel ) :
     LoggerBase( severity, debugLevel )

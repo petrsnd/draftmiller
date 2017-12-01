@@ -9,7 +9,7 @@
 #include <string>
 #include <sstream>
 
-namespace Magenta {
+namespace DraftMiller {
 
 class StringCreator
 {

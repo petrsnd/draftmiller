@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-namespace Magenta {
+namespace DraftMiller {
 
 class SyslogLogger : public LoggerBase
 {
