@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # draftmiller
 C++ implementation of draft-miller-ssh-agent-00
 
@@ -13,7 +12,7 @@ On macOs and Linux, we use a Unix Makefiles build system.  A Bash script has bee
 configure the build system via CMake, compile the code via make, and execute the unit tests.
 
 ```Bash
-$ ./build_proxy.sh -f
+$ ./build.sh -f
 ```
 
 ### Windows
@@ -25,5 +24,5 @@ modify the appropriate CMakeLists.txt file rather than the generated project fil
 classes or code files to the project.
 
 ```Powershell
-> .\build_proxy.ps1 -Force
+> .\build.ps1 -Force
 ```
