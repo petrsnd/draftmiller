@@ -64,7 +64,7 @@ configure()
         rm -rf "$SCRIPTDIR/Build"
         mkdir -p "$SCRIPTDIR/Build"
         cd "$SCRIPTDIR/Build"
-        cmake ../src -G "Unix Makefiles"
+        cmake ../ -G "Unix Makefiles"
         set +e
     fi
 }
@@ -132,8 +132,8 @@ if [ "$HELP" = "true" ]; then
     print_usage
 fi
 if [ "$FORCE" = "true" -o "$CLEAN" = "true" ]; then
-    rm -rf "$SCRIPTDIR/src/Build"
-    echo "Removed files at $SCRIPTDIR/src/Build"
+    rm -rf "$SCRIPTDIR/Build"
+    echo "Removed files at $SCRIPTDIR/Build"
     if [ "$CLEAN" = "true" ]; then exit 0; fi
 fi
 
