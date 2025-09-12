@@ -1,7 +1,9 @@
-// (c) 2017 petrsnd@gmail.com.  All rights reserved.
+// (c) 2025 petrsnd@secureidx.com.  All rights reserved.
 
 #include "DataBuffer.h"
 #include "StringUtils.h"
+
+#include <cstring>
 
 namespace DraftMiller {
 
@@ -21,13 +23,21 @@ void DataBuffer::InitExtractorAndAppender()
 #else
     if ( m_endianness == BigEndian )
     {
-        m_extractor = std::bind( &DraftMiller::DataBuffer::ByteSwapExtractInteger, this, std::placeholders::_1, std::placeholders::_2 );
-        m_appender = std::bind( &DraftMiller::DataBuffer::ByteSwapAppendInteger, this, std::placeholders::_1, std::placeholders::_2 );
+        m_extractor = [this](auto && PH1, auto && PH2) {
+            ByteSwapExtractInteger(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+        };
+        m_appender = [this](auto && PH1, auto && PH2) {
+            ByteSwapAppendInteger(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+        };
     }
     else
     {
-        m_extractor = std::bind( &DraftMiller::DataBuffer::NormalExtractInteger, this, std::placeholders::_1, std::placeholders::_2 );
-        m_appender = std::bind( &DraftMiller::DataBuffer::NormalAppendInteger, this, std::placeholders::_1, std::placeholders::_2 );
+        m_extractor = [this](auto && PH1, auto && PH2) {
+            NormalExtractInteger(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+        };
+        m_appender = [this](auto && PH1, auto && PH2) {
+            NormalAppendInteger(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+        };
     }
 #endif
 }
@@ -43,7 +53,7 @@ DataBuffer::DataBuffer( const unsigned char* uc, const size_t len, const Endiann
     m_frontPos( 0 ),
     m_endianness( e )
 {
-    WriteCharArray( ( const char* )uc, len, false );
+    WriteCharArray( reinterpret_cast<const char *>(uc), len, false );
     InitExtractorAndAppender();
 }
 DataBuffer::DataBuffer( const Buffer& b, const Endianness e ) :
@@ -60,8 +70,7 @@ DataBuffer::DataBuffer( const DataBuffer& d ) :
 {
     InitExtractorAndAppender();
 }
-DataBuffer::~DataBuffer()
-{}
+DataBuffer::~DataBuffer() = default;
 DataBuffer& DataBuffer::operator=( const DataBuffer& d )
 {
     m_data = std::vector< unsigned char >( d.m_data.begin() + d.m_frontPos, d.m_data.end() );
@@ -157,46 +166,46 @@ uint64_t DataBuffer::ReadUInt64()
 #endif
 char DataBuffer::ReadChar()
 {
-    return ( char )ExtractByte();
+    return static_cast<char>(ExtractByte());
 }
 unsigned char DataBuffer::ReadUChar()
 {
     return ExtractByte();
 }
-short DataBuffer::ReadShort()
+short DataBuffer::ReadShort() const
 {
     short ret = 0;
-    m_extractor( ( unsigned char* )&ret, sizeof( short ) );
+    m_extractor( reinterpret_cast<unsigned char *>(&ret), sizeof( short ) );
     return ret;
 }
-unsigned short DataBuffer::ReadUShort()
+unsigned short DataBuffer::ReadUShort() const
 {
     unsigned short ret = 0;
-    m_extractor( ( unsigned char* )&ret, sizeof( unsigned short ) );
+    m_extractor( reinterpret_cast<unsigned char *>(&ret), sizeof( unsigned short ) );
     return ret;
 }
-int DataBuffer::ReadInt()
+int DataBuffer::ReadInt() const
 {
     int ret = 0;
-    m_extractor( ( unsigned char* )&ret, sizeof( int ) );
+    m_extractor( reinterpret_cast<unsigned char *>(&ret), sizeof( int ) );
     return ret;
 }
 unsigned int DataBuffer::ReadUInt()
 {
     unsigned int ret = 0;
-    m_extractor( ( unsigned char* )&ret, sizeof( unsigned int ) );
+    m_extractor( reinterpret_cast<unsigned char *>(&ret), sizeof( unsigned int ) );
     return ret;
 }
-long DataBuffer::ReadLong()
+long DataBuffer::ReadLong() const
 {
     long ret = 0;
-    m_extractor( ( unsigned char* )&ret, sizeof( long ) );
+    m_extractor( reinterpret_cast<unsigned char *>(&ret), sizeof( long ) );
     return ret;
 }
-unsigned long DataBuffer::ReadULong()
+unsigned long DataBuffer::ReadULong() const
 {
     unsigned long ret = 0;
-    m_extractor( ( unsigned char* )&ret, sizeof( unsigned long ) );
+    m_extractor( reinterpret_cast<unsigned char *>(&ret), sizeof( unsigned long ) );
     return ret;
 }
 char* DataBuffer::ReadCharArray( const size_t len )
@@ -206,7 +215,7 @@ char* DataBuffer::ReadCharArray( const size_t len )
         throw DataBufferException(
                 SC() << "Request to read CharArray (" << len << ") larger than DataBuffer (" << Size() << ")" );
     }
-    char* ret = ( char* )calloc( sizeof( char ), len + 1);
+    char* ret = static_cast<char *>(calloc(sizeof(char), len + 1));
     memcpy( ret, &m_data[m_frontPos], len );
     m_frontPos += len;
     return ret;
@@ -218,7 +227,7 @@ unsigned char* DataBuffer::ReadUCharArray( const size_t len )
         throw DataBufferException(
                 SC() << "Request to read UCharArray (" << len << ") larger than DataBuffer (" << Size() << ")" );
     }
-    return ( unsigned char* )ReadCharArray( len );
+    return reinterpret_cast<unsigned char *>(ReadCharArray(len));
 }
 std::string DataBuffer::ReadString( const size_t len )
 {
@@ -227,7 +236,7 @@ std::string DataBuffer::ReadString( const size_t len )
         throw DataBufferException(
                 SC() << "Request to read String (" << len << ") larger than DataBuffer (" << Size() << ")" );
     }
-    char* c = ReadCharArray( len );
+    const char* c = ReadCharArray( len );
     return std::string( c, len );
 }
 std::string DataBuffer::ReadNullTerminatedString()
@@ -294,45 +303,45 @@ void DataBuffer::WriteUInt64( const uint64_t ui )
 #endif
 void DataBuffer::WriteChar( const char c )
 {
-    m_data.push_back( ( unsigned char )c );
+    m_data.push_back( static_cast<unsigned char>(c) );
 }
 void DataBuffer::WriteUChar( const unsigned char uc )
 {
     m_data.push_back( uc );
 }
-void DataBuffer::WriteShort( const short s )
+void DataBuffer::WriteShort( const short s ) const
 {
-    m_appender( ( const unsigned char* )&s, sizeof( short ) );
+    m_appender( reinterpret_cast<const unsigned char *>(&s), sizeof( short ) );
 }
-void DataBuffer::WriteUShort( const unsigned short us )
+void DataBuffer::WriteUShort( const unsigned short us ) const
 {
-    m_appender( ( const unsigned char* )&us, sizeof( unsigned short ) );
+    m_appender( reinterpret_cast<const unsigned char *>(&us), sizeof( unsigned short ) );
 }
-void DataBuffer::WriteInt( const int i )
+void DataBuffer::WriteInt( const int i ) const
 {
-    m_appender( ( const unsigned char* )&i, sizeof( int ) );
+    m_appender( reinterpret_cast<const unsigned char *>(&i), sizeof( int ) );
 }
-void DataBuffer::WriteUInt( const unsigned int ui )
+void DataBuffer::WriteUInt( const unsigned int ui ) const
 {
-    m_appender( ( const unsigned char* )&ui, sizeof( unsigned int ) );
+    m_appender( reinterpret_cast<const unsigned char *>(&ui), sizeof( unsigned int ) );
 }
-void DataBuffer::WriteLong( const long l )
+void DataBuffer::WriteLong( const long l ) const
 {
-    m_appender( ( const unsigned char* )&l, sizeof( long ) );
+    m_appender( reinterpret_cast<const unsigned char *>(&l), sizeof( long ) );
 }
-void DataBuffer::WriteULong( const unsigned long ul )
+void DataBuffer::WriteULong( const unsigned long ul ) const
 {
-    m_appender( ( const unsigned char* )&ul, sizeof( unsigned long ) );
+    m_appender( reinterpret_cast<const unsigned char *>(&ul), sizeof( unsigned long ) );
 }
 Buffer DataBuffer::ReadBuffer()
 {
-	Buffer ret;
-	ret.resize(m_data.size() - m_frontPos);
-	if (ret.size() > 0)
-	{
-		memcpy(&ret[0], &m_data[m_frontPos], m_data.size() - m_frontPos);
-		m_frontPos += (m_data.size() - m_frontPos);
-	}    
+    Buffer ret;
+    ret.resize(m_data.size() - m_frontPos);
+    if (!ret.empty())
+    {
+        memcpy(&ret[0], &m_data[m_frontPos], m_data.size() - m_frontPos);
+        m_frontPos += (m_data.size() - m_frontPos);
+    }
     return ret;
 }
 Buffer DataBuffer::ReadBuffer( const size_t len )
@@ -369,7 +378,7 @@ char* DataBuffer::ReadCharArray()
         ret.push_back( uc );
     }
     ret.push_back( '\0' );
-    char* arr = ( char* )calloc( sizeof( char ), ret.size());
+    const auto arr = static_cast<char *>(calloc(sizeof(char), ret.size()));
     memcpy( arr, &ret[0], ret.size() );
     return arr;
 }
@@ -400,17 +409,17 @@ unsigned char* DataBuffer::ReadUCharArray()
         ret.push_back( uc );
     }
     ret.push_back( '\0' );
-    unsigned char* arr = ( unsigned char* )calloc( sizeof( unsigned char ), ret.size());
+    auto* arr = static_cast<unsigned char *>(calloc(sizeof(unsigned char), ret.size()));
     memcpy( arr, &ret[0], ret.size() );
     return arr;
 }
 void DataBuffer::WriteUCharArray( const unsigned char* uc, bool keepNullTerminator )
 {
-    WriteCharArray( ( const char* )uc, keepNullTerminator );
+    WriteCharArray( reinterpret_cast<const char *>(uc), keepNullTerminator );
 }
 void DataBuffer::WriteUCharArray( const unsigned char* uc, const size_t len, bool addNullTerminator )
 {
-    WriteCharArray( ( const char* )uc, len, addNullTerminator );
+    WriteCharArray( reinterpret_cast<const char *>(uc), len, addNullTerminator );
 }
 void DataBuffer::WriteString( const std::string& s, bool addNullTerminator )
 {
@@ -427,7 +436,7 @@ unsigned char DataBuffer::ExtractByte()
     {
         throw DataBufferException( "Attempt to extract byte from empty DataBuffer" );
     }
-    unsigned char ret = m_data[m_frontPos];
+    const unsigned char ret = m_data[m_frontPos];
     m_frontPos++;
     return ret;
 }

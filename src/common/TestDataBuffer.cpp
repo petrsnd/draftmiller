@@ -1,14 +1,17 @@
-// (c) 2017 petrsnd@gmail.com.  All rights reserved.
+// (c) 2025 petrsnd@secureidx.com.  All rights reserved.
 
 #include "DataBuffer.h"
 
 #include "UnitTestSuite.h"
+
+#include <cstring>
 
 using namespace DraftMiller;
 
 // DataBuffer.h
 static void TestDataBufferConstructFromUnsignedCharArray()
 {
+#if defined( _INT8_T )
     unsigned char data[] = { '\01', '\02', '\03', '\04' };
     DataBuffer buf( data, 4 );
     int8_t expected1 = 1;
@@ -20,9 +23,11 @@ static void TestDataBufferConstructFromUnsignedCharArray()
     ASSERT_ARE_EQUAL( buf.ReadInt8(), expected3 );
     ASSERT_ARE_EQUAL( buf.ReadInt8(), expected4 );
     ASSERT_TRUE( buf.Empty() );
+#endif
 }
 static void TestDataBufferConstructFromBuffer()
 {
+#if defined( _INT8_T )
     Buffer buffer;
     buffer.push_back( '\01' );
     buffer.push_back( '\02' );
@@ -38,9 +43,11 @@ static void TestDataBufferConstructFromBuffer()
     ASSERT_ARE_EQUAL( buf.ReadInt8(), expected3 );
     ASSERT_ARE_EQUAL( buf.ReadInt8(), expected4 );
     ASSERT_TRUE( buf.Empty() );
+#endif
 }
 static void TestDataBufferCopyConstructor()
 {
+#if defined( _INT8_T )
     unsigned char data[] = { '\01', '\02', '\03', '\04' };
     DataBuffer buf( data, 4 );
     DataBuffer buf2( buf );
@@ -53,9 +60,11 @@ static void TestDataBufferCopyConstructor()
     ASSERT_ARE_EQUAL( buf2.ReadInt8(), expected3 );
     ASSERT_ARE_EQUAL( buf2.ReadInt8(), expected4 );
     ASSERT_TRUE( buf2.Empty() );
+#endif
 }
 static void TestDataBufferAssignmentOperator()
 {
+#if defined( _INT8_T )
     unsigned char data[] = { '\01', '\02', '\03', '\04' };
     DataBuffer buf( data, 4 );
     DataBuffer buf2 = buf;
@@ -68,9 +77,11 @@ static void TestDataBufferAssignmentOperator()
     ASSERT_ARE_EQUAL( buf2.ReadInt8(), expected3 );
     ASSERT_ARE_EQUAL( buf2.ReadInt8(), expected4 );
     ASSERT_TRUE( buf2.Empty() );
+#endif
 }
 static void TestDataBufferClear()
 {
+#if defined( _INT8_T )
     unsigned char data[] = { '\01', '\02', '\03', '\04' };
     DataBuffer buf( data, 4 );
     buf.WriteInt8( 0x7f );
@@ -84,9 +95,11 @@ static void TestDataBufferClear()
     ASSERT_FALSE( buf.Empty() );
     buf.Clear();
     ASSERT_TRUE( buf.Empty() );
+#endif
 }
 static void TestDataBufferSize()
 {
+#if defined( _INT8_T )
     unsigned char data[] = { '\01', '\02', '\03', '\04' };
     DataBuffer buf( data, 4 );
     ASSERT_ARE_EQUAL( buf.Size(), 4 );
@@ -113,9 +126,11 @@ static void TestDataBufferSize()
     int32_t expected5 = 0;
     ASSERT_ARE_EQUAL( buf.ReadInt32(), expected5 );
     ASSERT_ARE_EQUAL( buf.Size(), 0 );
+#endif
 }
 static void TestDataBufferBracketOperator()
 {
+#if defined( _INT8_T )
     unsigned char data[] = { '\01', '\02', '\03', '\04' };
     DataBuffer buf( data, 4 );
     buf.WriteInt8( 0x7f );
@@ -132,6 +147,7 @@ static void TestDataBufferBracketOperator()
     ASSERT_ARE_EQUAL( buf[5], expected3 );
     ASSERT_ARE_EQUAL( buf.ReadInt8(), expected4 );
     ASSERT_ARE_EQUAL( buf[5], expected5 );
+#endif
 }
 static void TestDataBufferReadWriteInt8()
 {
@@ -559,6 +575,7 @@ static void TestDataBufferReadWriteUChar()
 }
 static void TestDataBufferReadWriteShort()
 {
+#if defined( _INT16_T )
     unsigned char data[] = { 0x00, 0x01, 0x01, 0x00 };
     DataBuffer bigEndianBuf;
     DataBuffer littleEndianBuf( DataBuffer::LittleEndian );
@@ -602,6 +619,7 @@ static void TestDataBufferReadWriteShort()
     ASSERT_ARE_EQUAL( littleEndianBuf2.ReadShort(), 0x7f00 );
     ASSERT_TRUE( littleEndianBuf2.Empty() );
     ASSERT_ARE_EQUAL( littleEndianBuf2.Size(), 0 );
+#endif
 }
 static void TestDataBufferReadWriteUShort()
 {
@@ -952,11 +970,13 @@ static void TestDataBufferReadWriteBuffer()
     arr = buf.ReadBuffer();
     ASSERT_TRUE( arr.empty() );
     buf.Clear();
+#if defined( _INT32_T )
     buf.WriteBuffer( data1 );
     buf.ReadUInt32();
     arr = buf.ReadBuffer( 4 );
     Buffer expected3 = { 0x05, 0x06, 0x07, 0x08 };
     ASSERT_ARE_EQUAL( arr, expected3 );
+#endif
 }
 
 

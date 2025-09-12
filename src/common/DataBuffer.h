@@ -1,6 +1,6 @@
 #pragma once
 
-// (c) 2017 petrsnd@gmail.com.  All rights reserved.
+// (c) 2025 petrsnd@secureidx.com.  All rights reserved.
 
 #if HAVE_CONFIG_H
 #include <config.h>
@@ -29,11 +29,11 @@ namespace DraftMiller {
 class DataBufferException : public Exception
 {
 public:
-    DataBufferException(const std::string& msg ) :
+    explicit DataBufferException(const std::string& msg ) :
         Exception( msg )
     {}
-    virtual ~DataBufferException()
-    {}
+
+    ~DataBufferException() override = default;
 };
 
 class DataBuffer
@@ -47,14 +47,14 @@ public:
         BigEndian = 1, // network byte order
         LittleEndian = 2
     };
-    DataBuffer( const Endianness e = BigEndian );
-    DataBuffer( const unsigned char* uc, const size_t len, const Endianness e = BigEndian );
-    DataBuffer( const Buffer& b, const Endianness e = BigEndian );
+    explicit DataBuffer( Endianness e = BigEndian );
+    DataBuffer( const unsigned char* uc, size_t len, Endianness e = BigEndian );
+    explicit DataBuffer( const Buffer& b, Endianness e = BigEndian );
     DataBuffer( const DataBuffer& d );
     ~DataBuffer();
     DataBuffer& operator=( const DataBuffer& d );
 
-    operator Buffer() const;
+    explicit operator Buffer() const;
 
     void Clear();
     size_t Size() const;
@@ -95,48 +95,48 @@ public:
     void WriteUInt64( const uint64_t ui );
 #endif
     char ReadChar();
-    void WriteChar( const char c );
+    void WriteChar( char c );
 
     unsigned char ReadUChar();
-    void WriteUChar( const unsigned char uc );
+    void WriteUChar( unsigned char uc );
 
-    short ReadShort();
-    void WriteShort( const short s );
+    short ReadShort() const;
+    void WriteShort( short s ) const;
 
-    unsigned short ReadUShort();
-    void WriteUShort( const unsigned short us );
+    unsigned short ReadUShort() const;
+    void WriteUShort( unsigned short us ) const;
 
-    int ReadInt();
-    void WriteInt( const int i );
+    int ReadInt() const;
+    void WriteInt( int i ) const;
 
     unsigned int ReadUInt();
-    void WriteUInt( const unsigned int ui );
+    void WriteUInt( unsigned int ui ) const;
 
-    long ReadLong();
-    void WriteLong( const long l );
+    long ReadLong() const;
+    void WriteLong( long l ) const;
 
-    unsigned long ReadULong();
-    void WriteULong( const unsigned long ul );
+    unsigned long ReadULong() const;
+    void WriteULong( unsigned long ul ) const;
 
     Buffer ReadBuffer();
-    Buffer ReadBuffer( const size_t len );
+    Buffer ReadBuffer( size_t len );
     void WriteBuffer( const Buffer& buf );
-    void WriteBuffer( const Buffer& buf, const size_t len );
+    void WriteBuffer( const Buffer& buf, size_t len );
 
     char* ReadCharArray();
     void WriteCharArray( const char* c, bool keepNullTerminator = true );
-    char* ReadCharArray( const size_t len );
-    void WriteCharArray( const char* c, const size_t len, bool addNullTerminator = false );
+    char* ReadCharArray( size_t len );
+    void WriteCharArray( const char* c, size_t len, bool addNullTerminator = false );
 
     unsigned char* ReadUCharArray();
     void WriteUCharArray( const unsigned char* uc, bool keepNullTerminator = true );
-    unsigned char* ReadUCharArray( const size_t len );
-    void WriteUCharArray( const unsigned char* uc, const size_t len, bool addNullTerminator = false );
+    unsigned char* ReadUCharArray( size_t len );
+    void WriteUCharArray( const unsigned char* uc, size_t len, bool addNullTerminator = false );
 
-    std::string ReadString( const size_t len );
+    std::string ReadString( size_t len );
     std::string ReadNullTerminatedString();
     void WriteString( const std::string& s, bool addNullTerminator = true );
-    void WriteString( const std::string& s, const size_t len, bool addNullTerminator = true );
+    void WriteString( const std::string& s, size_t len, bool addNullTerminator = true );
 
 private:
     unsigned char ExtractByte();

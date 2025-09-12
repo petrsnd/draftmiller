@@ -1,4 +1,4 @@
-// (c) 2017 petrsnd@gmail.com.  All rights reserved.
+// (c) 2025 petrsnd@secureidx.com.  All rights reserved.
 
 #include "ConsoleLogger.h"
 

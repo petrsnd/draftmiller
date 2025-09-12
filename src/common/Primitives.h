@@ -1,6 +1,6 @@
 #pragma once
 
-// (c) 2017 petrsnd@gmail.com.  All Rights Reserved.
+// (c) 2025 petrsnd@secureidx.com.  All rights reserved.
 
 #if HAVE_CONFIG_H
 #include <config.h>
