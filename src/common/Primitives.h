@@ -10,7 +10,7 @@
 
 namespace DraftMiller {
 
-typedef std::vector< unsigned char > Buffer;
+typedef std::vector<unsigned char> Buffer;
 
 } // Magenta
 

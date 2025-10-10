@@ -6,41 +6,28 @@
 #include <config.h>
 #endif
 
+#include <stdexcept>
 #include <string>
 
 namespace DraftMiller {
 
-class IException
+class Exception : public std::runtime_error
 {
 public:
-    virtual std::string What() const = 0;
-};
-    
-class Exception : public IException
-{
-public:
-    Exception( const std::string& msg ) : m_msg( msg )
+    explicit Exception(const std::string &msg) : runtime_error(msg)
     {}
-    virtual ~Exception()
-    {}
-    virtual std::string What() const
-    {
-        return m_msg;
-    }
+    ~Exception() override = default;
 protected:
-    Exception() : m_msg( "" )
+    Exception() : runtime_error("")
     {}
-    std::string m_msg;
 };
 
-class NotImplementedException : public Exception
+class NotImplementedException final : public Exception
 {
 public:
-    NotImplementedException() : Exception( "Not Implemented" )
+    explicit NotImplementedException() : Exception("Not Implemented")
     {}
-    virtual ~NotImplementedException()
-    {}
+    ~NotImplementedException() override = default;
 };
 
 } // Magenta
-

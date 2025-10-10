@@ -10,6 +10,7 @@
 #include "StringUtils.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <iostream>
 
@@ -18,28 +19,21 @@
 
 namespace DraftMiller {
 
-class UnitTestException
+class UnitTestException final : public std::runtime_error
 {
 public:
-    UnitTestException( std::string errmsg ) : m_errmsg( errmsg )
+    explicit UnitTestException(const std::string& errmsg) : std::runtime_error(errmsg)
     {}
-    ~UnitTestException()
-    {}
-    std::string ErrorMessage() const
-    {
-        return m_errmsg;
-    }
-private:
-    std::string m_errmsg;
+    ~UnitTestException() override = default;
 };
 
 class UnitTestResult
 {
 public:
-    UnitTestResult( const bool passed = true, const std::string& errmsg = "" ) : m_passed( passed ), m_errmsg( errmsg )
+    explicit UnitTestResult(const bool passed = true, std::string  errmsg = "") :
+        m_passed(passed), m_errmsg(std::move(errmsg))
     {}
-    virtual ~UnitTestResult()
-    {}
+    virtual ~UnitTestResult() = default;
 
     bool Passed() const
     {
@@ -58,10 +52,9 @@ class UnitTest
 {
 public:
     typedef std::function< void () > func_t;
-    UnitTest( const std::string& name, func_t func ) : m_name( name ), m_func( func )
+    UnitTest(std::string name, func_t func) : m_name(std::move(name)), m_func(std::move(func))
     {}
-    virtual ~UnitTest()
-    {}
+    virtual ~UnitTest() = default;
 
     std::string Name() const
     {
@@ -74,21 +67,21 @@ public:
             m_func();
             return UnitTestResult();
         }
-        catch ( const UnitTestException& e )
+        catch (const UnitTestException& e)
         {
-            return UnitTestResult( false, e.ErrorMessage() );
+            return UnitTestResult(false, e.what());
         }
-        catch ( const NotImplementedException& e )
+        catch (const NotImplementedException& e)
         {
-            return UnitTestResult( false, e.What() );
+            return UnitTestResult(false, e.what());
         }
-        catch ( const Exception& e )
+        catch (const Exception& e)
         {
-            return UnitTestResult( false, SC() << "Unexpected exception: " << e.What() );
+            return UnitTestResult(false, SC() << "Unexpected exception: " << e.what());
         }
-        catch ( ... )
+        catch (...)
         {
-            return UnitTestResult( false, "Unhandled exception" );
+            return UnitTestResult(false, "Unhandled exception");
         }
     }
 protected:
@@ -100,25 +93,24 @@ typedef std::vector< UnitTest > UnitTestList;
 class UnitTestSuite
 {
 public:
-    UnitTestSuite( const std::string& name ) : m_name( name )
+    explicit UnitTestSuite(std::string name) : m_name(std::move(name))
     {}
-    virtual ~UnitTestSuite()
-    {}
+    virtual ~UnitTestSuite() = default;
 
-    void RegisterTest( const UnitTest& t )
+    void RegisterTest(const UnitTest& t)
     {
-        m_unitTests.push_back( t );
+        m_unitTests.push_back(t);
     }
     bool ExecuteTests() const
     {
         std::cout << "Executing UnitTestSuite: " << m_name << std::endl;
         std::cout << "Total Tests: " << m_unitTests.size() << std::endl;
         size_t totalPassed = 0;
-        for ( UnitTestList::const_iterator it = m_unitTests.begin(); it != m_unitTests.end(); it++ )
+        for (const auto& m_unitTest : m_unitTests)
         {
-            std::cout << "    " << it->Name() << " : " << std::flush;
-            UnitTestResult r = it->Execute();
-            if ( r.Passed() )
+            std::cout << "    " << m_unitTest.Name() << " : " << std::flush;
+            UnitTestResult r = m_unitTest.Execute();
+            if (r.Passed())
             {
                 std::cout << "PASSED" << std::endl;
                 totalPassed++;
@@ -130,32 +122,32 @@ public:
             }
         }
         std::cout << "Results: " << totalPassed << " of " << m_unitTests.size() << " passed" << std::endl << std::endl;
-        return ( m_unitTests.size() - totalPassed ) == 0;
+        return (m_unitTests.size() - totalPassed) == 0;
     }
 protected:
     std::string m_name;
     UnitTestList m_unitTests;
 };
 
-#define DECLARE_UNIT_TEST_SUITE( name ) UnitTestSuite testsuite##name( #name );
-#define ADD_UNIT_TEST( name, test ) testsuite##name.RegisterTest( UnitTest( #test, &test ) );
-#define END_UNIT_TEST_SUITE( name, ret ) ret = testsuite##name.ExecuteTests();
+#define DECLARE_UNIT_TEST_SUITE(name) UnitTestSuite testsuite##name(#name);
+#define ADD_UNIT_TEST(name, test) testsuite##name.RegisterTest(UnitTest(#test, &test));
+#define END_UNIT_TEST_SUITE(name, ret) ret = testsuite##name.ExecuteTests();
 
-#define FAIL_TEST( msg ) \
-    throw UnitTestException( msg )
-#define ASSERT_TRUE( expr ) if ( ! ( expr ) ) \
-    throw UnitTestException( "Assertion failed: ( " + std::string( #expr ) + " ) did not evaluate to true." );
-#define ASSERT_FALSE( expr ) if ( expr ) \
-    throw UnitTestException( "Assertion failed: ( " + std::string( #expr ) + " ) should evaluate to false." );
-#define ASSERT_ARE_EQUAL( expr1, expr2 ) if ( ! ( ( expr1 ) == ( expr2 ) ) ) \
-    throw UnitTestException( "Assertion failed: ( " + std::string( #expr1 ) + " ) is not equal to ( " \
-    + std::string( #expr2 ) + " ), i.e. operator==() returned false" );
-#define ASSERT_ARE_NOT_EQUAL( expr1, expr2 ) if ( ! ( ( expr1 ) != ( expr2 ) ) ) \
-    throw UnitTestException( "Assertion failed: ( " + std::string( #expr1 ) + " ) is *NOT* not equal to ( " \
-    + std::string( #expr2 ) + " ), i.e. operator!=() returned false" );
-#define ASSERT_THROWS( expr, excptn ) try { expr; \
-    throw UnitTestException( "Assertion failed: ( " + std::string( #expr ) + " ) did not throw an exception, expected " \
-    + std::string( #excptn ) ); } catch ( const excptn ) {}
+#define FAIL_TEST(msg) \
+    throw UnitTestException(msg)
+#define ASSERT_TRUE(expr) if (! (expr)) \
+    throw UnitTestException("Assertion failed: (" + std::string(#expr) + ") did not evaluate to true.");
+#define ASSERT_FALSE(expr) if (expr) \
+    throw UnitTestException("Assertion failed: (" + std::string(#expr) + ") should evaluate to false.");
+#define ASSERT_ARE_EQUAL(expr1, expr2) if (! ((expr1) == (expr2))) \
+    throw UnitTestException("Assertion failed: (" + std::string(#expr1) + ") is not equal to (" \
+    + std::string(#expr2) + "), i.e. operator==() returned false");
+#define ASSERT_ARE_NOT_EQUAL(expr1, expr2) if (! ((expr1) != (expr2))) \
+    throw UnitTestException("Assertion failed: (" + std::string(#expr1) + ") is *NOT* not equal to (" \
+    + std::string(#expr2) + "), i.e. operator!=() returned false");
+#define ASSERT_THROWS(expr, excptn) try { expr; \
+    throw UnitTestException("Assertion failed: (" + std::string(#expr) + ") did not throw an exception, expected " \
+    + std::string(#excptn)); } catch (const excptn&) {}
 
 } // Magenta
 
