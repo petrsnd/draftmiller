@@ -13,16 +13,6 @@
 #include <functional>
 #include <string>
 #include <vector>
-#if defined(_MSC_VER)
-#define _INT8_T 1
-#define _UINT8_T 1
-#define _INT16_T 1
-#define _UINT16_T 1
-#define _INT32_T 1
-#define _UINT32_T 1
-#define _INT64_T 1
-#define _UINT64_T 1
-#endif
 
 namespace DraftMiller {
 
@@ -59,38 +49,22 @@ public:
     unsigned char& operator[](size_t n);
     const unsigned char& operator[](size_t n) const;
 
-#if defined(_INT8_T)
     int8_t ReadInt8();
     void WriteInt8(const int8_t i);
-#endif
-#if defined(_UINT8_T)
     uint8_t ReadUInt8();
     void WriteUInt8(const uint8_t ui);
-#endif
-#if defined(_INT16_T)
     int16_t ReadInt16();
     void WriteInt16(const int16_t i);
-#endif
-#if defined(_UINT16_T)
     uint16_t ReadUInt16();
     void WriteUInt16(const uint16_t ui);
-#endif
-#if defined(_INT32_T)
     int32_t ReadInt32();
     void WriteInt32(const int32_t i);
-#endif
-#if defined(_UINT32_T)
     uint32_t ReadUInt32();
     void WriteUInt32(const uint32_t ui);
-#endif
-#if defined(_INT64_T)
     int64_t ReadInt64();
     void WriteInt64(const int64_t i);
-#endif
-#if defined(_UINT64_T)
     uint64_t ReadUInt64();
     void WriteUInt64(const uint64_t ui);
-#endif
     char ReadChar();
     void WriteChar(char c);
 

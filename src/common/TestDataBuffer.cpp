@@ -878,10 +878,10 @@ static void TestDataBufferReadWriteUCharArray()
     buf.WriteUCharArray(data, true);
     ASSERT_FALSE(buf.Empty());
     ASSERT_ARE_EQUAL(buf.Size(), 16);
-    b = buf.ReadBuffer();
-    ASSERT_TRUE(memcmp(&b[0], data, 8) == 0);
-    b = buf.ReadBuffer();
-    ASSERT_TRUE(memcmp(&b[0], data, 8) == 0);
+    std::string s = buf.ReadNullTerminatedString();
+    ASSERT_TRUE(memcmp(s.c_str(), data, 7) == 0);
+    s = buf.ReadNullTerminatedString();
+    ASSERT_TRUE(memcmp(s.c_str(), data, 7) == 0);
     ASSERT_TRUE(buf.Empty());
 }
 static void TestDataBufferReadWriteUCharArrayWithLength()

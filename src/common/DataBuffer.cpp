@@ -113,66 +113,50 @@ const unsigned char& DataBuffer::operator[](size_t n) const
 {
     return m_data[m_frontPos + n];
 }
-#if defined(_INT8_T)
 int8_t DataBuffer::ReadInt8()
 {
     return (int8_t)ExtractByte();
 }
-#endif
-#if defined(_UINT8_T)
 uint8_t DataBuffer::ReadUInt8()
 {
     return (uint8_t)ExtractByte();
 }
-#endif
-#if defined(_INT16_T)
 int16_t DataBuffer::ReadInt16()
 {
     int16_t ret = 0;
     m_extractor((unsigned char*)&ret, sizeof(int16_t));
     return ret;
 }
-#endif
-#if defined(_UINT16_T)
 uint16_t DataBuffer::ReadUInt16()
 {
     uint16_t ret = 0;
     m_extractor((unsigned char*)&ret, sizeof(uint16_t));
     return ret;
 }
-#endif
-#if defined(_INT32_T)
 int32_t DataBuffer::ReadInt32()
 {
     int32_t ret = 0;
     m_extractor((unsigned char*)&ret, sizeof(int32_t));
     return ret;
 }
-#endif
-#if defined(_UINT32_T)
 uint32_t DataBuffer::ReadUInt32()
 {
     uint32_t ret = 0;
     m_extractor((unsigned char*)&ret, sizeof(uint32_t));
     return ret;
 }
-#endif
-#if defined(_INT64_T)
 int64_t DataBuffer::ReadInt64()
 {
     int64_t ret = 0;
     m_extractor((unsigned char*)&ret, sizeof(int64_t));
     return ret;
 }
-#endif
-#if defined(_UINT64_T)
 uint64_t DataBuffer::ReadUInt64()
 {
     uint64_t ret = 0;
     m_extractor((unsigned char*)&ret, sizeof(uint64_t));
     return ret;
 }
-#endif
 char DataBuffer::ReadChar()
 {
     return static_cast<char>(ExtractByte());
@@ -252,54 +236,38 @@ std::string DataBuffer::ReadNullTerminatedString()
 
     return ret;
 }
-#if defined(_INT8_T)
 void DataBuffer::WriteInt8(const int8_t i)
 {
     m_data.push_back((unsigned char)i);
 }
-#endif
-#if defined(_UINT8_T)
 void DataBuffer::WriteUInt8(const uint8_t ui)
 {
     m_data.push_back((unsigned char)ui);
 }
-#endif
-#if defined(_INT16_T)
 void DataBuffer::WriteInt16(const int16_t i)
 {
     m_appender((const unsigned char*)&i, sizeof(int16_t));
 }
-#endif
-#if defined(_UINT16_T)
 void DataBuffer::WriteUInt16(const uint16_t ui)
 {
     m_appender((const unsigned char*)&ui, sizeof(uint16_t));
 }
-#endif
-#if defined(_INT32_T)
 void DataBuffer::WriteInt32(const int32_t i)
 {
     m_appender((const unsigned char*)&i, sizeof(int32_t));
 }
-#endif
-#if defined(_UINT32_T)
 void DataBuffer::WriteUInt32(const uint32_t ui)
 {
     m_appender((const unsigned char*)&ui, sizeof(uint32_t));
 }
-#endif
-#if defined(_INT64_T)
 void DataBuffer::WriteInt64(const int64_t i)
 {
     m_appender((const unsigned char*)&i, sizeof(int64_t));
 }
-#endif
-#if defined(_UINT64_T)
 void DataBuffer::WriteUInt64(const uint64_t ui)
 {
     m_appender((const unsigned char*)&ui, sizeof(uint64_t));
 }
-#endif
 void DataBuffer::WriteChar(const char c)
 {
     m_data.push_back(static_cast<unsigned char>(c));

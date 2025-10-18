@@ -10,18 +10,19 @@ using namespace DraftMiller;
 // Anonymous namespace for registrations
 namespace {
 
-bool reg = DraftMillerContext::Instance()->Register(SSH_AGENTC_SIGN_REQUEST,
-[](const DmMessage::Ptr& message) -> DmMessage::Ptr
-    {
-        ASSERT_ARE_EQUAL(message->Number, SSH_AGENTC_SIGN_REQUEST);
-        auto signRequest = std::dynamic_pointer_cast<DmSignRequest >(message);
-        ASSERT_ARE_EQUAL(signRequest->KeyBlob, Buffer({ 0xba, 0xbe }));
-        ASSERT_ARE_EQUAL(signRequest->Data, Buffer({ 0xfe, 0xeb, 0x1e }));
-        ASSERT_ARE_EQUAL(signRequest->Flags, 3434);
-        auto signResponse = std::make_shared<DmSignResponse>();
-		signResponse->Signature = { "ecdsa-25519", { 0x00, 0x01, 0x02, 0x03, 0x04, 0xa0, 0xaf, 0xde, 0xad, 0xbe, 0xef } };
-        return signResponse;
-    });
+    // ReSharper disable once CppDeclaratorNeverUsed
+    bool reg = DraftMillerContext::Instance()->Register(SSH_AGENTC_SIGN_REQUEST,
+        [](const DmMessage::Ptr& message) -> DmMessage::Ptr
+        {
+            ASSERT_ARE_EQUAL(message->Number, SSH_AGENTC_SIGN_REQUEST);
+            auto signRequest = std::dynamic_pointer_cast<DmSignRequest >(message);
+            ASSERT_ARE_EQUAL(signRequest->KeyBlob, Buffer({ 0xba, 0xbe }));
+            ASSERT_ARE_EQUAL(signRequest->Data, Buffer({ 0xfe, 0xeb, 0x1e }));
+            ASSERT_ARE_EQUAL(signRequest->Flags, 3434);
+            auto signResponse = std::make_shared<DmSignResponse>();
+            signResponse->Signature = { "ecdsa-25519", { 0x00, 0x01, 0x02, 0x03, 0x04, 0xa0, 0xaf, 0xde, 0xad, 0xbe, 0xef } };
+            return signResponse;
+        });
 
 }
 

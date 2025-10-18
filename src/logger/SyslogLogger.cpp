@@ -7,9 +7,9 @@
 
 namespace DraftMiller {
 
-static int ConvertToSyslogSeverity( const LoggerSeverity& severity )
+static int ConvertToSyslogSeverity(const LoggerSeverity& severity)
 {
-    switch ( severity )
+    switch (severity)
     {
         case LoggerSeverity::EMERGENCY:
             return LOG_EMERG;
@@ -32,31 +32,31 @@ static int ConvertToSyslogSeverity( const LoggerSeverity& severity )
 }
 
 
-SyslogLogger::SyslogLogger( const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel, const int facility ) :
-    LoggerBase( severity, debugLevel ),
-    m_facility( facility )
+SyslogLogger::SyslogLogger(const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel, const int facility) :
+    LoggerBase(severity, debugLevel),
+    m_facility(facility)
 {}
-void SyslogLogger::Log( const std::string& logMessage )
+void SyslogLogger::Log(const std::string& logMessage)
 {
-    syslog( m_facility | ConvertToSyslogSeverity( m_severity ), "%s", logMessage.c_str() );
+    syslog(m_facility | ConvertToSyslogSeverity(m_severity), "%s", logMessage.c_str());
 }
 
 void RegisterSyslogLogger(
     const int facility,
     const bool writeToStdErr,
-    const LoggerDebugLevel& debugThreshold )
+    const LoggerDebugLevel& debugThreshold)
 {
-    std::atexit( []() {
+    std::atexit([]() {
         closelog();
-    } );
+    });
 
-    openlog( nullptr, LOG_PID | ( writeToStdErr ? 0 : LOG_PERROR ), facility );
+    openlog(nullptr, LOG_PID | (writeToStdErr ? 0 : LOG_PERROR), facility);
 
     LoggerConfig::Instance()->Initialize(
-        [facility] ( const LoggerSeverity severity, const LoggerDebugLevel debugLevel ) -> LoggerBase::Ptr
+        [facility] (const LoggerSeverity severity, const LoggerDebugLevel debugLevel) -> LoggerBase::Ptr
         {
-            return std::make_shared< SyslogLogger >( severity, debugLevel, facility );
-        }, debugThreshold );
+            return std::make_shared< SyslogLogger >(severity, debugLevel, facility);
+        }, debugThreshold);
 }
 
 } // Magenta
