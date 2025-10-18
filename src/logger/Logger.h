@@ -8,10 +8,11 @@
 #include <memory>
 #include <string>
 #include <sstream>
+#include <utility>
 
 namespace DraftMiller {
 
-BETTER_ENUM(LoggerSeverity, char,
+BETTER_ENUM(LoggerSeverity, char, // NOLINT(*-explicit-constructor)
     EMERGENCY = 0,
     ALERT = 1,
     CRITICAL = 2,
@@ -22,7 +23,7 @@ BETTER_ENUM(LoggerSeverity, char,
     DEBUG = 7
 )
 
-BETTER_ENUM(LoggerDebugLevel, char,
+BETTER_ENUM(LoggerDebugLevel, char, // NOLINT(*-explicit-constructor)
     LEVEL_0 = 0,
     LEVEL_1 = 1,
     LEVEL_2 = 2,
@@ -66,8 +67,8 @@ typedef std::function<LoggerBase::Ptr(const LoggerSeverity&, const LoggerDebugLe
 class LoggerImpl
 {
 public:
-    LoggerImpl(const LoggerBase::Ptr& logger, const LoggerDebugLevel& debugThreshold) :
-        m_logger(logger),
+    LoggerImpl(LoggerBase::Ptr  logger, const LoggerDebugLevel& debugThreshold) :
+        m_logger(std::move(logger)),
         m_debugThreshold(debugThreshold)
     {}
     LoggerImpl(const LoggerImpl& loggerImpl) :
@@ -101,7 +102,7 @@ public:
     NullLogger(const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel) :
         LoggerBase(severity, debugLevel)
     {}
-    virtual void Log(const std::string& logMessage)
+    void Log(const std::string& logMessage) override
     {}
 };
 
@@ -138,7 +139,7 @@ public:
     LoggerImpl CreateLogger(
         const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel = LoggerDebugLevel::LEVEL_0)
     {
-        return LoggerImpl(m_loggerCreator(severity, debugLevel), m_debugThreshold);
+        return {m_loggerCreator(severity, debugLevel), m_debugThreshold};
     }
 private:
     LoggerCreator m_loggerCreator;

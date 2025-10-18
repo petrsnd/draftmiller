@@ -2,10 +2,6 @@
 
 // (c) 2025 petrsnd@secureidx.com.  All rights reserved.
 
-#if HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "Exception.h"
 #include "Primitives.h"
 
@@ -41,7 +37,7 @@ public:
     ~DataBuffer();
     DataBuffer& operator=(const DataBuffer& d);
 
-    operator Buffer() const;
+    operator Buffer() const;  // NOLINT(*-explicit-constructor)
 
     void Clear();
     size_t Size() const;
@@ -50,21 +46,21 @@ public:
     const unsigned char& operator[](size_t n) const;
 
     int8_t ReadInt8();
-    void WriteInt8(const int8_t i);
+    void WriteInt8(int8_t i);
     uint8_t ReadUInt8();
-    void WriteUInt8(const uint8_t ui);
+    void WriteUInt8(uint8_t ui);
     int16_t ReadInt16();
-    void WriteInt16(const int16_t i);
+    void WriteInt16(int16_t i);
     uint16_t ReadUInt16();
-    void WriteUInt16(const uint16_t ui);
+    void WriteUInt16(uint16_t ui);
     int32_t ReadInt32();
-    void WriteInt32(const int32_t i);
+    void WriteInt32(int32_t i);
     uint32_t ReadUInt32();
-    void WriteUInt32(const uint32_t ui);
+    void WriteUInt32(uint32_t ui);
     int64_t ReadInt64();
-    void WriteInt64(const int64_t i);
+    void WriteInt64(int64_t i);
     uint64_t ReadUInt64();
-    void WriteUInt64(const uint64_t ui);
+    void WriteUInt64(uint64_t ui);
     char ReadChar();
     void WriteChar(char c);
 

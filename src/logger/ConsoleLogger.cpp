@@ -2,6 +2,8 @@
 
 #include "ConsoleLogger.h"
 
+#include <iostream>
+
 namespace DraftMiller {
 
 ConsoleLogger::ConsoleLogger(const LoggerSeverity& severity, const LoggerDebugLevel& debugLevel) :

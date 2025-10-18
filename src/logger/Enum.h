@@ -11,7 +11,7 @@
 
 #include <cstddef>
 #include <cstring>
-#include <iosfwd>
+// #include <iosfwd>
 #include <stdexcept>
 
 
@@ -335,12 +335,12 @@ struct optional {
     BETTER_ENUMS_CONSTEXPR_ optional() :
         _valid(false), _value(_default<T>()) { }
 
-    BETTER_ENUMS_CONSTEXPR_ optional(T v) : _valid(true), _value(v) { }
+    BETTER_ENUMS_CONSTEXPR_ optional(T v) : _valid(true), _value(v) { } // NOLINT(*-explicit-constructor)
 
     BETTER_ENUMS_CONSTEXPR_ const T& operator *() const { return _value; }
     BETTER_ENUMS_CONSTEXPR_ const T* operator ->() const { return &_value; }
 
-    BETTER_ENUMS_CONSTEXPR_ operator bool() const { return _valid; }
+    BETTER_ENUMS_CONSTEXPR_ operator bool() const { return _valid; }  // NOLINT(*-explicit-constructor)
 
     BETTER_ENUMS_CONSTEXPR_ const T& value() const { return _value; }
 
@@ -415,10 +415,10 @@ struct _eat_assign {
         { }
 
     template <typename Any>
-    BETTER_ENUMS_CONSTEXPR_ const _eat_assign&
+    BETTER_ENUMS_CONSTEXPR_ const _eat_assign& // NOLINT(*-unconventional-assign-operator)
     operator =(Any) const { return *this; }
 
-    BETTER_ENUMS_CONSTEXPR_ operator EnumType () const { return _value; }
+    BETTER_ENUMS_CONSTEXPR_ operator EnumType () const { return _value; } // NOLINT(*-explicit-constructor)
 
   private:
     EnumType    _value;

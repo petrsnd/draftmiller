@@ -234,7 +234,7 @@ DmMessage::Ptr DmParseMessage(Buffer& buffer)
 {
     try
     {
-        size_t bytesRemoved = 0;
+        Buffer::difference_type bytesRemoved = 0;
         DataBuffer db(buffer);
         uint32_t packetSize = db.ReadUInt32();
         if (db.Size() < packetSize)
@@ -245,7 +245,7 @@ DmMessage::Ptr DmParseMessage(Buffer& buffer)
         // Create a new DataBuffer to ensure only the correct number of bytes are parsed
         DataBuffer dbMessage(db.ReadBuffer(packetSize));
         DmMessage::Ptr parsedMessage = DmParseMessageInternal(dbMessage);
-        bytesRemoved = sizeof(uint32_t) + packetSize;
+        bytesRemoved = static_cast<Buffer::difference_type>(sizeof(uint32_t)) + packetSize;
         buffer.erase(buffer.begin(), buffer.begin() + bytesRemoved);
         return parsedMessage;
     }

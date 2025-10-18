@@ -2,10 +2,6 @@
 
 // (c) 2025 petrsnd@secureidx.com.  All rights reserved.
 
-#if HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "Exception.h"
 #include "StringUtils.h"
 
@@ -130,24 +126,23 @@ protected:
 };
 
 #define DECLARE_UNIT_TEST_SUITE(name) UnitTestSuite testsuite##name(#name);
-#define ADD_UNIT_TEST(name, test) testsuite##name.RegisterTest(UnitTest(#test, &test));
+#define ADD_UNIT_TEST(name, test) (testsuite##name).RegisterTest(UnitTest((#test), &(test)));
 #define END_UNIT_TEST_SUITE(name, ret) ret = testsuite##name.ExecuteTests();
 
 #define FAIL_TEST(msg) \
     throw UnitTestException(msg)
-#define ASSERT_TRUE(expr) if (! (expr)) \
+#define ASSERT_TRUE(expr) if (!(expr)) \
     throw UnitTestException("Assertion failed: (" + std::string(#expr) + ") did not evaluate to true.");
 #define ASSERT_FALSE(expr) if (expr) \
     throw UnitTestException("Assertion failed: (" + std::string(#expr) + ") should evaluate to false.");
-#define ASSERT_ARE_EQUAL(expr1, expr2) if (! ((expr1) == (expr2))) \
+#define ASSERT_ARE_EQUAL(expr1, expr2) if (!((expr1) == (expr2))) \
     throw UnitTestException("Assertion failed: (" + std::string(#expr1) + ") is not equal to (" \
-    + std::string(#expr2) + "), i.e. operator==() returned false");
-#define ASSERT_ARE_NOT_EQUAL(expr1, expr2) if (! ((expr1) != (expr2))) \
+        + std::string(#expr2) + "), i.e. operator==() returned false");
+#define ASSERT_ARE_NOT_EQUAL(expr1, expr2) if (!((expr1) != (expr2))) \
     throw UnitTestException("Assertion failed: (" + std::string(#expr1) + ") is *NOT* not equal to (" \
-    + std::string(#expr2) + "), i.e. operator!=() returned false");
-#define ASSERT_THROWS(expr, excptn) try { expr; \
+        + std::string(#expr2) + "), i.e. operator!=() returned false");
+#define ASSERT_THROWS(expr, ex) try { expr; \
     throw UnitTestException("Assertion failed: (" + std::string(#expr) + ") did not throw an exception, expected " \
-    + std::string(#excptn)); } catch (const excptn&) {}
+        + std::string(#ex)); } catch (const ex&) {}
 
 } // Magenta
-

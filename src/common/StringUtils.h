@@ -2,10 +2,6 @@
 
 // (c) 2025 petrsnd@secureidx.com.  All rights reserved.
 
-#if HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <string>
 #include <sstream>
 
@@ -20,7 +16,7 @@ public:
         m_ss << value;
         return *this;
     }
-    operator std::string() const
+    operator std::string() const // NOLINT(*-explicit-constructor)
     {
         return m_ss.str();
     }

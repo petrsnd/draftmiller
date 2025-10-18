@@ -115,46 +115,52 @@ const unsigned char& DataBuffer::operator[](size_t n) const
 }
 int8_t DataBuffer::ReadInt8()
 {
-    return (int8_t)ExtractByte();
+    return static_cast<int8_t>(ExtractByte());
 }
 uint8_t DataBuffer::ReadUInt8()
 {
-    return (uint8_t)ExtractByte();
+    return static_cast<uint8_t>(ExtractByte());
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 int16_t DataBuffer::ReadInt16()
 {
     int16_t ret = 0;
-    m_extractor((unsigned char*)&ret, sizeof(int16_t));
+    m_extractor(reinterpret_cast<unsigned char*>(&ret), sizeof(int16_t));
     return ret;
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 uint16_t DataBuffer::ReadUInt16()
 {
     uint16_t ret = 0;
-    m_extractor((unsigned char*)&ret, sizeof(uint16_t));
+    m_extractor(reinterpret_cast<unsigned char*>(&ret), sizeof(uint16_t));
     return ret;
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 int32_t DataBuffer::ReadInt32()
 {
     int32_t ret = 0;
-    m_extractor((unsigned char*)&ret, sizeof(int32_t));
+    m_extractor(reinterpret_cast<unsigned char*>(&ret), sizeof(int32_t));
     return ret;
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 uint32_t DataBuffer::ReadUInt32()
 {
     uint32_t ret = 0;
-    m_extractor((unsigned char*)&ret, sizeof(uint32_t));
+    m_extractor(reinterpret_cast<unsigned char*>(&ret), sizeof(uint32_t));
     return ret;
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 int64_t DataBuffer::ReadInt64()
 {
     int64_t ret = 0;
-    m_extractor((unsigned char*)&ret, sizeof(int64_t));
+    m_extractor(reinterpret_cast<unsigned char*>(&ret), sizeof(int64_t));
     return ret;
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 uint64_t DataBuffer::ReadUInt64()
 {
     uint64_t ret = 0;
-    m_extractor((unsigned char*)&ret, sizeof(uint64_t));
+    m_extractor(reinterpret_cast<unsigned char*>(&ret), sizeof(uint64_t));
     return ret;
 }
 char DataBuffer::ReadChar()
@@ -238,35 +244,41 @@ std::string DataBuffer::ReadNullTerminatedString()
 }
 void DataBuffer::WriteInt8(const int8_t i)
 {
-    m_data.push_back((unsigned char)i);
+    m_data.push_back(static_cast<unsigned char>(i));
 }
 void DataBuffer::WriteUInt8(const uint8_t ui)
 {
-    m_data.push_back((unsigned char)ui);
+    m_data.push_back(static_cast<unsigned char>(ui));
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 void DataBuffer::WriteInt16(const int16_t i)
 {
-    m_appender((const unsigned char*)&i, sizeof(int16_t));
+    m_appender(reinterpret_cast<const unsigned char*>(&i), sizeof(int16_t));
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 void DataBuffer::WriteUInt16(const uint16_t ui)
 {
-    m_appender((const unsigned char*)&ui, sizeof(uint16_t));
+    m_appender(reinterpret_cast<const unsigned char*>(&ui), sizeof(uint16_t));
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 void DataBuffer::WriteInt32(const int32_t i)
 {
-    m_appender((const unsigned char*)&i, sizeof(int32_t));
+    m_appender(reinterpret_cast<const unsigned char*>(&i), sizeof(int32_t));
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 void DataBuffer::WriteUInt32(const uint32_t ui)
 {
-    m_appender((const unsigned char*)&ui, sizeof(uint32_t));
+    m_appender(reinterpret_cast<const unsigned char*>(&ui), sizeof(uint32_t));
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 void DataBuffer::WriteInt64(const int64_t i)
 {
-    m_appender((const unsigned char*)&i, sizeof(int64_t));
+    m_appender(reinterpret_cast<const unsigned char*>(&i), sizeof(int64_t));
 }
+// ReSharper disable once CppMemberFunctionMayBeConst
 void DataBuffer::WriteUInt64(const uint64_t ui)
 {
-    m_appender((const unsigned char*)&ui, sizeof(uint64_t));
+    m_appender(reinterpret_cast<const unsigned char*>(&ui), sizeof(uint64_t));
 }
 void DataBuffer::WriteChar(const char c)
 {
