@@ -1,7 +1,7 @@
 #!/bin/bash
-PREVDIR=`pwd`
-SCRIPTDIR=`cd \`dirname $0\` && pwd`
-BUILDARGS=
+PREVIOUS_DIR=`pwd`
+SCRIPT_DIR=`cd \`dirname $0\` && pwd`
+BUILD_ARGS=
 CLEAN=
 FORCE=
 PACKAGE=
@@ -9,12 +9,12 @@ CONF="Release"
 TOOL="$0"
 VERSION=
 BUILDNUMBER=
-FULLVERSION=
+FULL_VERSION=
 
-cd "$SCRIPTDIR"
+cd "$SCRIPT_DIR"
 return_to_previous_directory()
 {
-    cd "$PREVDIR"
+    cd "$PREVIOUS_DIR"
 }
 trap return_to_previous_directory INT TERM EXIT
 
@@ -29,12 +29,12 @@ check_for_tool_in_path()
 }
 check_cmake_version()
 {
-    CMAKEVER=`cmake --version | head -1 | cut -f3 -d' '`
-    echo "CMake $CMAKEVER found"
-    CMAKEMAJOR=`echo $CMAKEVER | cut -f1 -d.`
-    CMAKEMINOR=`echo $CMAKEVER | cut -f2 -d.`
-    CMAKEMICRO=`echo $CMAKEVER | cut -f3 -d.`
-    if [ $CMAKEMAJOR -lt 3 -o $CMAKEMINOR -lt 1 ]; then
+    CMAKE_VERSION=`cmake --version | head -1 | cut -f3 -d' '`
+    echo "CMake $CMAKE_VERSION found"
+    CMAKE_MAJOR=`echo $CMAKE_VERSION | cut -f1 -d.`
+    CMAKE_MINOR=`echo $CMAKE_VERSION | cut -f2 -d.`
+    CMAKE_MICRO=`echo $CMAKE_VERSION | cut -f3 -d.`
+    if [ $CMAKE_MAJOR -lt 3 -o $CMAKE_MINOR -lt 1 ]; then
         echo "CMake version 3.8.2 or greater is required"
         exit 1
     fi
@@ -48,22 +48,22 @@ check_for_prerequisites()
 set_version()
 {
     echo "Setting version information for build"
-    cp $SCRIPTDIR/version.txt /tmp/version.txt
+    cp $SCRIPT_DIR/version.txt /tmp/version.txt
     dos2unix /tmp/version.txt
     VERSION=`cat /tmp/version.txt`
-    cp $SCRIPTDIR/build.txt /tmp/build.txt
+    cp $SCRIPT_DIR/build.txt /tmp/build.txt
     dos2unix /tmp/build.txt
     BUILDNUMBER=`cat /tmp/build.txt`
-    FULLVERSION=`echo $VERSION.$BUILDNUMBER`
-    echo "FULLVERSION: $FULLVERSION"
+    FULL_VERSION=`echo $VERSION.$BUILDNUMBER`
+    echo "FULL_VERSION: $FULL_VERSION"
 }
 configure()
 {
-    if [ ! -f "$SCRIPTDIR/Build/CMakeCache.txt" ]; then
+    if [ ! -f "$SCRIPT_DIR/Build/CMakeCache.txt" ]; then
         set -e
-        rm -rf "$SCRIPTDIR/Build"
-        mkdir -p "$SCRIPTDIR/Build"
-        cd "$SCRIPTDIR/Build"
+        rm -rf "$SCRIPT_DIR/Build"
+        mkdir -p "$SCRIPT_DIR/Build"
+        cd "$SCRIPT_DIR/Build"
         cmake ../ -G "Unix Makefiles"
         set +e
     fi
@@ -71,10 +71,10 @@ configure()
 build()
 {
     set -e
-    cd "$SCRIPTDIR/Build"
+    cd "$SCRIPT_DIR/Build"
     make
     if [ $? -eq 0 ]; then
-        echo "Build succeeded -- Artifacts at $SCRIPTDIR/Build/"
+        echo "Build succeeded -- Artifacts at $SCRIPT_DIR/Build/"
     else
         echo "Build failed!"
         exit 1
@@ -89,7 +89,7 @@ build()
     if [ "$PACKAGE" = "true" ]; then
         echo "TODO: Code Signing ..."
     fi
-    cd "$SCRIPTDIR"
+    cd "$SCRIPT_DIR"
     set +e
 }
 package()
@@ -132,8 +132,8 @@ if [ "$HELP" = "true" ]; then
     print_usage
 fi
 if [ "$FORCE" = "true" -o "$CLEAN" = "true" ]; then
-    rm -rf "$SCRIPTDIR/Build"
-    echo "Removed files at $SCRIPTDIR/Build"
+    rm -rf "$SCRIPT_DIR/Build"
+    echo "Removed files at $SCRIPT_DIR/Build"
     if [ "$CLEAN" = "true" ]; then exit 0; fi
 fi
 

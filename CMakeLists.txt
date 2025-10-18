@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 include(TestBigEndian)
 test_big_endian(WORD_BIG_ENDIAN)
-string(TOUPPER "${CMAKE_SYSTEM_NAME}" OPERATINGSYSTEMRAW)
-string(REGEX REPLACE "-" "" OPERATINGSYSTEM "${OPERATINGSYSTEMRAW}")
+string(TOUPPER "${CMAKE_SYSTEM_NAME}" OPERATING_SYSTEM_RAW)
+string(REGEX REPLACE "-" "" OPERATING_SYSTEM "${OPERATING_SYSTEM_RAW}")
 
 file(STRINGS "copyright.txt" COPYRIGHT_INFO)
 file(STRINGS "version.txt" FULL_VERSION)
@@ -36,10 +36,10 @@ add_subdirectory(src)
 
 enable_testing()
 
-add_test(NAME TestDataTypes COMMAND testdatatypes)
-add_test(NAME TestDataBuffer COMMAND testdatabuffer)
-add_test(NAME TestStringUtils COMMAND teststringutils)
+add_test(NAME TestDataTypes COMMAND test-data-types)
+add_test(NAME TestDataBuffer COMMAND test-data-buffer)
+add_test(NAME TestStringUtils COMMAND test-string-utils)
 
-add_test(NAME TestRequestIdentities COMMAND testrequestidentities)
-add_test(NAME TestSignRequest COMMAND testsignrequest)
+add_test(NAME TestRequestIdentities COMMAND test-request-identities)
+add_test(NAME TestSignRequest COMMAND test-sign-request)
 

@@ -10,11 +10,12 @@ using namespace DraftMiller;
 // Anonymous namespace for registrations
 namespace {
 
+// ReSharper disable once CppDeclaratorNeverUsed
 bool reg = DraftMillerContext::Instance()->Register(SSH_AGENTC_REQUEST_IDENTITIES,
-[](const DmMessage::Ptr& message) -> DmMessage::Ptr
+    [](const DmMessage::Ptr& message) -> DmMessage::Ptr
     {
         ASSERT_ARE_EQUAL(message->Number, SSH_AGENTC_REQUEST_IDENTITIES);
-        DmIdentitiesAnswer::Ptr identitiesAnswer = std::make_shared< DmIdentitiesAnswer >();
+        DmIdentitiesAnswer::Ptr identitiesAnswer = std::make_shared<DmIdentitiesAnswer>();
         identitiesAnswer->NumberKeys = 2;
         identitiesAnswer->Keys.push_back({ { 0x00, 0x01, 0x02, 0x03 }, "abcdef" });
         identitiesAnswer->Keys.push_back({ { 0x10, 0x11, 0x12, 0x13 }, "uvwxyz" });
@@ -105,23 +106,23 @@ Buffer s_realIdentitiesAnswer = {
 
 static void TestEncodeParseRequest()
 {
-    auto request = std::make_shared< DmRequestIdentities >();
+    auto request = std::make_shared<DmRequestIdentities>();
     Buffer requestEncoded = DmEncodeMessage(request);
     auto requestParsed = DmParseMessage(requestEncoded);
-    ASSERT_FALSE(std::dynamic_pointer_cast< DmRequestIdentities >(requestParsed) == nullptr);
+    ASSERT_FALSE(std::dynamic_pointer_cast<DmRequestIdentities>(requestParsed) == nullptr);
     ASSERT_ARE_EQUAL(request->Number, requestParsed->Number);
 }
 
 static void TestEncodeParseResponse()
 {
-    auto response = std::make_shared< DmIdentitiesAnswer >();
+    auto response = std::make_shared<DmIdentitiesAnswer>();
     response->NumberKeys = 3;
     response->Keys.push_back({ { 0x20, 0x21, 0x22, 0x23 }, "hello world!" });
     response->Keys.push_back({ { 0x50, 0x51, 0x52, 0x53 }, "foobar" });
     response->Keys.push_back({ { 0x50, 0x51, 0x52, 0x53, 0x60, 0x61, 0x62 }, "Magenta " });
     Buffer responseEncoded = DmEncodeMessage(response);
     auto responseParsed = DmParseMessage(responseEncoded);
-    ASSERT_FALSE(std::dynamic_pointer_cast< DmIdentitiesAnswer >(responseParsed) == nullptr);
+    ASSERT_FALSE(std::dynamic_pointer_cast<DmIdentitiesAnswer>(responseParsed) == nullptr);
     ASSERT_ARE_EQUAL(response->Number, responseParsed->Number);
     ASSERT_ARE_EQUAL(response->NumberKeys, 3);
     ASSERT_ARE_EQUAL(response->Keys[0].KeyBlob, Buffer({ 0x20, 0x21, 0x22, 0x23 }));
@@ -134,13 +135,13 @@ static void TestEncodeParseResponse()
 
 static void TestRequestResponse()
 {
-    auto request = std::make_shared< DmRequestIdentities >();
-    Buffer requestBuffer = DmEncodeMessage(std::dynamic_pointer_cast< DmMessage >(request));
+    auto request = std::make_shared<DmRequestIdentities>();
+    Buffer requestBuffer = DmEncodeMessage(std::dynamic_pointer_cast<DmMessage>(request));
     Buffer responseBuffer = DraftMillerContext::Instance()->HandleMessage(requestBuffer);
     auto message = DmParseMessage(responseBuffer);
     if (message->Number == SSH_AGENT_FAILURE)
         throw UnitTestException("DraftMillerContext return SSH_AGENT_FAILURE");
-    auto response = std::dynamic_pointer_cast< DmIdentitiesAnswer >(message);
+    auto response = std::dynamic_pointer_cast<DmIdentitiesAnswer>(message);
     ASSERT_FALSE(response == nullptr);
     ASSERT_ARE_EQUAL(response->Number, SSH_AGENT_IDENTITIES_ANSWER);
     ASSERT_ARE_EQUAL(response->NumberKeys, 2);

@@ -8,7 +8,7 @@ files for IDEs that don't natively support CMake.
 
 ### macOs / Linux
 
-On macOs and Linux, we use a Unix Makefiles build system.  A Bash script has been provided to
+On macOS and Linux, we use a Unix Makefiles build system.  A Bash script has been provided to
 configure the build system via CMake, compile the code via make, and execute the unit tests.
 
 ```Bash

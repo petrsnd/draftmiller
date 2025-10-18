@@ -9,8 +9,8 @@ add_library(draftmiller
 
 copy_headers_to_include()
 
-add_executable(testrequestidentities TestRequestIdentities.cpp)
-target_link_libraries(testrequestidentities draftmiller logger common)
+add_executable(test-request-identities TestRequestIdentities.cpp)
+target_link_libraries(test-request-identities draftmiller logger common)
 
-add_executable(testsignrequest TestSignRequest.cpp)
-target_link_libraries(testsignrequest draftmiller logger common)
+add_executable(test-sign-request TestSignRequest.cpp)
+target_link_libraries(test-sign-request draftmiller logger common)

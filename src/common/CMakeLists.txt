@@ -12,12 +12,12 @@ add_library(common
 
 copy_headers_to_include()
 
-add_executable(testdatabuffer TestDataBuffer.cpp UnitTestSuite.h)
-target_link_libraries(testdatabuffer common)
+add_executable(test-data-buffer TestDataBuffer.cpp UnitTestSuite.h)
+target_link_libraries(test-data-buffer common)
 
-add_executable(testdatatypes TestDataTypes.cpp UnitTestSuite.h)
-target_link_libraries(testdatatypes common)
+add_executable(test-data-types TestDataTypes.cpp UnitTestSuite.h)
+target_link_libraries(test-data-types common)
 
-add_executable(teststringutils TestStringUtils.cpp UnitTestSuite.h)
-target_link_libraries(teststringutils common)
+add_executable(test-string-utils TestStringUtils.cpp UnitTestSuite.h)
+target_link_libraries(test-string-utils common)
 

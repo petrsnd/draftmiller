@@ -20,33 +20,31 @@ function Find-Tool
 
 function Install-Prerequisites
 {
-    $ChocoExe = (& Find-Tool "choco.exe")
-    if (-not $ChocoExe)
+    $CMakeExe = (& Find-Tool "cmake.exe")
+    if (-not $CMakeExe)
     {
-        Write-Host -ForegroundColor Green "In order to be sure have the right tools this script installs Chocolatey."
+        $WinGetExe = (& Find-Tool "winget.exe")
+        if (-not $WinGetExe)
+        {
+            Write-Host -ForegroundColor "This script uses WinGet to install prerequisites, please install winget.exe."
+            exit 1
+        }
+
+        Write-Host -ForegroundColor Green "This script uses WinGet to install prerequisites."
         $YN = Read-Host -Prompt "Are you okay with this? (y/n):"
         if ($YN -ieq "y" -or $YN -ieq "yes")
         {
-            Write-Host -ForegroundColor Yellow "Installing Chocolatey..."
-            Start-Process "$($Env:SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe" `
-                -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
-                    "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))", "-NoExit")
-                -Verb RunAs -Wait
-            $ChocoExe = "$($Env:ProgramData)\chocolatey\bin\choco.exe"
+            Write-Host -ForegroundColor Yellow "Installing CMake..."
+            Start-Process $WinGetExe -ArgumentList `
+                @("install", "-e", "--id", "Kitware.CMake", "--source", "winget", "--scope", "machine") -Verb RunAs -Wait
+            Write-Host -ForegroundColor Yellow "Close this window and open a new PowerShell window to be sure your path is up to date."
+            exit 0
         }
         else
         {
             Write-Host -ForegroundColor Yellow "Goodbye!"
             exit 1
         }
-    }
-    $CMakeExe = (& Find-Tool "cmake.exe")
-    if (-not $CMakeExe)
-    {
-        Write-Host -ForegroundColor Yellow "Installing CMake..."
-        Start-Process $ChocoExe -ArgumentList @("install", "cmake", "-y", "--force") -Verb RunAs -Wait
-        Write-Host -ForegroundColor Yellow "Close this window and open a new PowerShell window to be sure your path is up to date."
-        exit 0
     }
 }
 

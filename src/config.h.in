@@ -1,4 +1,4 @@
 #pragma once
 
-#define @OPERATINGSYSTEM@ 1
+#define @OPERATING_SYSTEM@ 1
 #cmakedefine WORDS_BIGENDIAN 1
