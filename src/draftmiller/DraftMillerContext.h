@@ -9,10 +9,8 @@
 #include <Primitives.h>
 #include <Exception.h>
 
-#include <cstdint>
 #include <string>
 #include <vector>
-#include <utility>
 #include <functional>
 #include <memory>
 #include <map>
@@ -70,7 +68,7 @@ enum DmMessageNumber : uint8_t
     SSH_UNKNOWN_MESSAGE                         = 0
 };
 
-enum DmContraints
+enum DmConstraints
 {
     SSH_AGENT_CONSTRAIN_LIFETIME                = 1,
     SSH_AGENT_CONSTRAIN_CONFIRM                 = 2,
@@ -88,7 +86,7 @@ enum DmSignatureFlags
 struct DmPacket
 {
     DmPacket() :
-        Length( 0 )
+        Length(0)
     {}
     uint32_t Length;
     Buffer Contents;
@@ -104,13 +102,10 @@ struct DmKey
 
 struct DmDsa
 {
-    DmDsa()
-    {}
-    DmDsa( const DmDsa& dsa ) :
-        P( dsa.P ), Q( dsa.Q ), G( dsa.G ), Y( dsa.Y ), X( dsa.X )
-    {}
-    ~DmDsa()
-    {}
+    DmDsa() = default;
+    DmDsa(const DmDsa& dsa) = default;
+    ~DmDsa() = default;
+
     Buffer P;
     Buffer Q;
     Buffer G;
@@ -120,13 +115,10 @@ struct DmDsa
 
 struct DmEcdsa
 {
-    DmEcdsa()
-    {}
-    DmEcdsa( const DmEcdsa& ecdsa ) :
-        EcdsaCurveName( ecdsa.EcdsaCurveName ), Q( ecdsa.Q ), D( ecdsa.D )
-    {}
-    ~DmEcdsa()
-    {}
+    DmEcdsa() = default;
+    DmEcdsa(const DmEcdsa& ecdsa) = default;
+    ~DmEcdsa() = default;
+
     std::string EcdsaCurveName;
     Buffer Q;
     Buffer D;
@@ -134,26 +126,20 @@ struct DmEcdsa
 
 struct DmEd25519
 {
-    DmEd25519()
-    {}
-    DmEd25519( const DmEd25519& ed25519 ) :
-        EncA( ed25519.EncA ), KEncA( ed25519.KEncA )
-    {}
-    ~DmEd25519()
-    {}
+    DmEd25519() = default;
+    DmEd25519(const DmEd25519& ed25519) = default;
+    ~DmEd25519() = default;
+
     Buffer EncA;
     Buffer KEncA;
 };
 
 struct DmRsa
 {
-    DmRsa()
-    {}
-    DmRsa( const DmRsa& rsa ) :
-        N( rsa.N ), E( rsa.E ), D( rsa.D ), Iqmp( rsa.Iqmp ), P( rsa.P ), Q( rsa.Q )
-    {}
-    ~DmRsa()
-    {}
+    DmRsa() = default;
+    DmRsa(const DmRsa& rsa) = default;
+    ~DmRsa() = default;
+
     Buffer N;
     Buffer E;
     Buffer D;
@@ -168,6 +154,7 @@ union DmKeyUnion
     {}
     ~DmKeyUnion()
     {}
+
     DmDsa Dsa;
     DmEcdsa Ecdsa;
     DmEd25519 Ed25519;
@@ -176,239 +163,270 @@ union DmKeyUnion
 
 struct DmSignature
 {
-	std::string Algorithm;
-	Buffer SignatureBlob;
+    std::string Algorithm;
+    Buffer SignatureBlob;
 };
 
 // Request Messages
 struct DmMessage
 {
-    DmMessage( const DmMessageNumber number ) :
-        Number( number )
+    explicit DmMessage(const DmMessageNumber& number) :
+        Number(number)
     {}
-    virtual ~DmMessage()
-    {}
+    virtual ~DmMessage() = default;
+
     const DmMessageNumber Number;
-    typedef std::shared_ptr< DmMessage > Ptr;
+    typedef std::shared_ptr<DmMessage> Ptr;
 };
 
-struct DmRequestIdentities : public DmMessage
+struct DmRequestIdentities : DmMessage
 {
     DmRequestIdentities() :
-        DmMessage( SSH_AGENTC_REQUEST_IDENTITIES )
+        DmMessage(SSH_AGENTC_REQUEST_IDENTITIES)
     {}
-    typedef std::shared_ptr< DmRequestIdentities > Ptr;
+    ~DmRequestIdentities() override = default;
+
+    typedef std::shared_ptr<DmRequestIdentities> Ptr;
 };
 
-struct DmSignRequest : public DmMessage
+struct DmSignRequest : DmMessage
 {
     DmSignRequest() :
-        DmMessage( SSH_AGENTC_SIGN_REQUEST ),
-        Flags( 0 )
+        DmMessage(SSH_AGENTC_SIGN_REQUEST),
+        Flags(0)
     {}
+    ~DmSignRequest() override = default;
+
     Buffer KeyBlob;
     Buffer Data;
     uint32_t Flags;
-    typedef std::shared_ptr< DmSignRequest > Ptr;
+    typedef std::shared_ptr<DmSignRequest> Ptr;
 };
 
-struct DmAddIdentity : public DmMessage
+struct DmAddIdentity : DmMessage
 {
     DmAddIdentity() :
-        DmMessage( SSH_AGENTC_ADD_IDENTITY )
+        DmMessage(SSH_AGENTC_ADD_IDENTITY)
     {}
-    ~DmAddIdentity()
-    {}
+    ~DmAddIdentity() override = default;
+
     std::string Type;
     DmKeyUnion Key;
     std::string Comment;
-    typedef std::shared_ptr< DmAddIdentity > Ptr;
+    typedef std::shared_ptr<DmAddIdentity> Ptr;
 };
 
-struct DmRemoveIdentity : public DmMessage
+struct DmRemoveIdentity : DmMessage
 {
     DmRemoveIdentity() :
-        DmMessage( SSH_AGENTC_REMOVE_IDENTITY )
+        DmMessage(SSH_AGENTC_REMOVE_IDENTITY)
     {}
+    ~DmRemoveIdentity() override = default;
+
     Buffer KeyBlob;
-    typedef std::shared_ptr< DmRemoveIdentity > Ptr;
+    typedef std::shared_ptr<DmRemoveIdentity> Ptr;
 };
 
-struct DmRemoveAllIdentities : public DmMessage
+struct DmRemoveAllIdentities : DmMessage
 {
     DmRemoveAllIdentities() :
-        DmMessage( SSH_AGENTC_REMOVE_ALL_IDENTITIES )
+        DmMessage(SSH_AGENTC_REMOVE_ALL_IDENTITIES)
     {}
-    typedef std::shared_ptr< DmRemoveAllIdentities > Ptr;
+    ~DmRemoveAllIdentities() override = default;
+
+    typedef std::shared_ptr<DmRemoveAllIdentities> Ptr;
 };
 
-struct DmAddIdentityConstrained : public DmMessage
+struct DmAddIdentityConstrained : DmMessage
 {
     DmAddIdentityConstrained() :
-        DmMessage( SSH_AGENTC_ADD_ID_CONSTRAINED )
+        DmMessage(SSH_AGENTC_ADD_ID_CONSTRAINED)
     {}
+    ~DmAddIdentityConstrained() override = default;
+
     std::string Type;
     DmKeyUnion Key;
     std::string Comment;
     // TODO: Constraints
-    typedef std::shared_ptr< DmAddIdentityConstrained > Ptr;
+    typedef std::shared_ptr<DmAddIdentityConstrained> Ptr;
 };
 
-struct DmAddSmartCardKey : public DmMessage
+struct DmAddSmartCardKey : DmMessage
 {
     DmAddSmartCardKey() :
-        DmMessage( SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED )
+        DmMessage(SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED)
     {}
+    ~DmAddSmartCardKey() override = default;
+
     Buffer Id;
     std::string Pin;
-    typedef std::shared_ptr< DmAddSmartCardKey > Ptr;
+    typedef std::shared_ptr<DmAddSmartCardKey> Ptr;
 };
 
-struct DmRemoveSmartCardKey : public DmMessage
+struct DmRemoveSmartCardKey : DmMessage
 {
     DmRemoveSmartCardKey() :
-        DmMessage( SSH_AGENTC_REMOVE_SMARTCARD_KEY )
+        DmMessage(SSH_AGENTC_REMOVE_SMARTCARD_KEY)
     {}
+    ~DmRemoveSmartCardKey() override = default;
+
     Buffer Id;
     std::string Pin;
-    typedef std::shared_ptr< DmRemoveSmartCardKey > Ptr;
+    typedef std::shared_ptr<DmRemoveSmartCardKey> Ptr;
 };
 
-struct DmLock : public DmMessage
+struct DmLock : DmMessage
 {
     DmLock() :
-        DmMessage( SSH_AGENTC_LOCK )
+        DmMessage(SSH_AGENTC_LOCK)
     {}
+    ~DmLock() override = default;
+
     std::string PassPhrase;
-    typedef std::shared_ptr< DmLock > Ptr;
+    typedef std::shared_ptr<DmLock> Ptr;
 };
 
-struct DmUnlock : public DmMessage
+struct DmUnlock : DmMessage
 {
     DmUnlock() :
-        DmMessage( SSH_AGENTC_UNLOCK )
+        DmMessage(SSH_AGENTC_UNLOCK)
     {}
+    ~DmUnlock() override = default;
+
     std::string PassPhrase;
-    typedef std::shared_ptr< DmUnlock > Ptr;
+    typedef std::shared_ptr<DmUnlock> Ptr;
 };
 
-struct DmAddSmartCardKeyConstrained : public DmMessage
+struct DmAddSmartCardKeyConstrained : DmMessage
 {
     DmAddSmartCardKeyConstrained() :
-        DmMessage( SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED )
+        DmMessage(SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED)
     {}
+    ~DmAddSmartCardKeyConstrained() override = default;
+
     Buffer Id;
     std::string Pin;
     // TODO: Constraints
-    typedef std::shared_ptr< DmAddSmartCardKeyConstrained > Ptr;
+    typedef std::shared_ptr<DmAddSmartCardKeyConstrained> Ptr;
 };
 
-struct DmExtension : public DmMessage
+struct DmExtension : DmMessage
 {
     DmExtension() :
-        DmMessage( SSH_AGENTC_EXTENSION )
+        DmMessage(SSH_AGENTC_EXTENSION)
     {}
-    typedef std::shared_ptr< DmExtension > Ptr;
+    ~DmExtension() override = default;
+
+    typedef std::shared_ptr<DmExtension> Ptr;
 };
 
 // Response Messages
-struct DmFailure : public DmMessage
+struct DmFailure : DmMessage
 {
     DmFailure() :
-        DmMessage( SSH_AGENT_FAILURE )
+        DmMessage(SSH_AGENT_FAILURE)
     {}
-    typedef std::shared_ptr< DmFailure > Ptr;
+    ~DmFailure() override = default;
+
+    typedef std::shared_ptr<DmFailure> Ptr;
 };
 
-struct DmSuccess : public DmMessage
+struct DmSuccess : DmMessage
 {
     DmSuccess() :
-        DmMessage( SSH_AGENT_SUCCESS )
+        DmMessage(SSH_AGENT_SUCCESS)
     {}
-    typedef std::shared_ptr< DmSuccess > Ptr;
+    ~DmSuccess() override = default;
+
+    typedef std::shared_ptr<DmSuccess> Ptr;
 };
 
-struct DmIdentitiesAnswer : public DmMessage
+struct DmIdentitiesAnswer : DmMessage
 {
     DmIdentitiesAnswer() :
-        DmMessage( SSH_AGENT_IDENTITIES_ANSWER ),
-        NumberKeys( 0 )
+        DmMessage(SSH_AGENT_IDENTITIES_ANSWER),
+        NumberKeys(0)
     {}
+    ~DmIdentitiesAnswer() override = default;
+
     uint32_t NumberKeys;
     DmKey::List Keys;
-    typedef std::shared_ptr< DmIdentitiesAnswer > Ptr;
+    typedef std::shared_ptr<DmIdentitiesAnswer> Ptr;
 };
 
-struct DmSignResponse : public DmMessage
+struct DmSignResponse : DmMessage
 {
     DmSignResponse() :
-        DmMessage( SSH_AGENT_SIGN_RESPONSE )
+        DmMessage(SSH_AGENT_SIGN_RESPONSE)
     {}
-	DmSignature Signature;
-    typedef std::shared_ptr< DmSignResponse > Ptr;
+    ~DmSignResponse() override = default;
+
+    DmSignature Signature;
+    typedef std::shared_ptr<DmSignResponse> Ptr;
 };
 
-struct DmExtensionFailure : public DmMessage
+struct DmExtensionFailure : DmMessage
 {
     DmExtensionFailure() :
-        DmMessage( SSH_AGENT_EXTENSION_FAILURE )
+        DmMessage(SSH_AGENT_EXTENSION_FAILURE)
     {}
-    typedef std::shared_ptr< DmExtensionFailure > Ptr;
+    ~DmExtensionFailure() override = default;
+
+    typedef std::shared_ptr<DmExtensionFailure> Ptr;
 };
 
 // Unknown Message
-struct DmUnknownMessage : public DmMessage
+struct DmUnknownMessage : DmMessage
 {
-    DmUnknownMessage( const DmMessageNumber number ) :
-        DmMessage( number )
+    explicit DmUnknownMessage(const DmMessageNumber& number) :
+        DmMessage(number)
     {}
+    ~DmUnknownMessage() override = default;
+
     Buffer Payload;
-    typedef std::shared_ptr< DmUnknownMessage > Ptr;
+    typedef std::shared_ptr<DmUnknownMessage> Ptr;
 };
 
 // API
-class DmIncompletePacketException : public Exception
+class DmIncompletePacketException : public std::runtime_error
 {
 public:
-    DmIncompletePacketException( const std::string& msg ) :
-        Exception( msg )
+    explicit DmIncompletePacketException(const std::string& msg) :
+        std::runtime_error(msg)
     {}
-    virtual ~DmIncompletePacketException()
-    {}
+    ~DmIncompletePacketException() override = default;
 };
 
-class DmParseException : public Exception
+class DmParseException : public std::runtime_error
 {
 public:
-    DmParseException( const std::string& msg ) :
-        Exception( msg )
+    explicit DmParseException(const std::string& msg) :
+        std::runtime_error(msg)
     {}
-    virtual ~DmParseException()
-    {}
+    ~DmParseException() override = default;
 };
 
 /// Parse one DmMessage from the buffer and modify the buffer to remove those bytes
 /// @param buffer A buffer containing at least one DmMessage
 /// @throws DmParseException
 /// @returns A generic DmMessage structure that can be cast to the appropriate message type
-DmMessage::Ptr DmParseMessage( Buffer& buffer );
+DmMessage::Ptr DmParseMessage(Buffer& buffer);
 
 
-class DmEncodeException : public Exception
+class DmEncodeException : public std::runtime_error
 {
 public:
-    DmEncodeException( const std::string& msg ) :
-        Exception( msg )
+    explicit DmEncodeException(const std::string& msg) :
+        std::runtime_error(msg)
     {}
-    virtual ~DmEncodeException()
-    {}
+    ~DmEncodeException() override = default;
 };
 
 /// Encode one DmMessage based on the generic DmMessage structure passed in
 /// @param message A smart pointer to a generic DmMessage structure
 /// @throws DmEncodeException
 /// @returns A buffer containing the encoded message
-Buffer DmEncodeMessage( const DmMessage::Ptr& message );
+Buffer DmEncodeMessage(const DmMessage::Ptr& message);
 
 
 /// Singleton class for accessing message handlers.
@@ -422,7 +440,7 @@ public:
     typedef std::shared_ptr< DraftMillerContext > Ptr;
 private:
     DraftMillerContext();
-    typedef std::function< DmMessage::Ptr ( const DmMessage::Ptr& ) > MessageHandler;
+    typedef std::function< DmMessage::Ptr (const DmMessage::Ptr&) > MessageHandler;
     std::map< DmMessageNumber, MessageHandler > m_handlerRegistry;
 public:
     /// Obtain an instance of the singleton
@@ -432,7 +450,7 @@ public:
     /// @param number The number of the message type to register
     /// @param handler The handler to be called when this message is parsed
     /// @returns A bool only so it can do the static registration
-    bool Register( const DmMessageNumber number, const MessageHandler& handler );
+    bool Register(const DmMessageNumber& number, const MessageHandler& handler);
     /// Handle a request message buffer and obtain a response message buffer
     /// All valid messages will be removed even if a handler is not registered.  They will simply return
     /// a failure message.  If a message cannot be parsed because a complete packet was not found in the
@@ -440,7 +458,7 @@ public:
     /// more data and then call this method again.
     /// @param buffer A buffer to be handled, this parameter will be modified as messages are handled
     /// @throws DmParseException, DmEncodeException, DmIncompletePacketException
-    Buffer HandleMessage( Buffer& buffer );
+    Buffer HandleMessage(Buffer& buffer);
 };
 
 } // Magenta

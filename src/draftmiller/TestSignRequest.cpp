@@ -10,18 +10,18 @@ using namespace DraftMiller;
 // Anonymous namespace for registrations
 namespace {
 
-bool reg = DraftMillerContext::Instance()->Register( SSH_AGENTC_SIGN_REQUEST,
-                                                     []( const DmMessage::Ptr& message ) -> DmMessage::Ptr
+bool reg = DraftMillerContext::Instance()->Register(SSH_AGENTC_SIGN_REQUEST,
+[](const DmMessage::Ptr& message) -> DmMessage::Ptr
     {
-        ASSERT_ARE_EQUAL( message->Number, SSH_AGENTC_SIGN_REQUEST );
-        auto signRequest = std::dynamic_pointer_cast< DmSignRequest >( message );
-        ASSERT_ARE_EQUAL( signRequest->KeyBlob, Buffer( { 0xba, 0xbe } ) );
-        ASSERT_ARE_EQUAL( signRequest->Data, Buffer( { 0xfe, 0xeb, 0x1e } ) );
-        ASSERT_ARE_EQUAL( signRequest->Flags, 3434 );
-        DmSignResponse::Ptr signResponse = std::make_shared< DmSignResponse >();
+        ASSERT_ARE_EQUAL(message->Number, SSH_AGENTC_SIGN_REQUEST);
+        auto signRequest = std::dynamic_pointer_cast<DmSignRequest >(message);
+        ASSERT_ARE_EQUAL(signRequest->KeyBlob, Buffer({ 0xba, 0xbe }));
+        ASSERT_ARE_EQUAL(signRequest->Data, Buffer({ 0xfe, 0xeb, 0x1e }));
+        ASSERT_ARE_EQUAL(signRequest->Flags, 3434);
+        auto signResponse = std::make_shared<DmSignResponse>();
 		signResponse->Signature = { "ecdsa-25519", { 0x00, 0x01, 0x02, 0x03, 0x04, 0xa0, 0xaf, 0xde, 0xad, 0xbe, 0xef } };
         return signResponse;
-    } );
+    });
 
 }
 
@@ -112,73 +112,73 @@ Buffer s_realSignResponse = {
 
 static void TestEncodeParseRequest()
 {
-    auto request = std::make_shared< DmSignRequest >();
+    auto request = std::make_shared<DmSignRequest>();
     request->KeyBlob = { 0x12, 0x34, 0x45, 0x67, 0x89 };
     request->Data = { 0xab, 0xcd, 0xef };
     request->Flags = 123456789;
-    Buffer requestEncoded = DmEncodeMessage( request );
-    auto requestParsed = std::dynamic_pointer_cast< DmSignRequest >( DmParseMessage( requestEncoded ) );
-    ASSERT_FALSE( requestParsed == nullptr );
-    ASSERT_ARE_EQUAL( request->Number, requestParsed->Number );
-    ASSERT_ARE_EQUAL( request->KeyBlob, requestParsed->KeyBlob );
-    ASSERT_ARE_EQUAL( request->Data, requestParsed->Data );
-    ASSERT_ARE_EQUAL( request->Flags, requestParsed->Flags );
+    Buffer requestEncoded = DmEncodeMessage(request);
+    auto requestParsed = std::dynamic_pointer_cast<DmSignRequest>(DmParseMessage(requestEncoded));
+    ASSERT_FALSE(requestParsed == nullptr);
+    ASSERT_ARE_EQUAL(request->Number, requestParsed->Number);
+    ASSERT_ARE_EQUAL(request->KeyBlob, requestParsed->KeyBlob);
+    ASSERT_ARE_EQUAL(request->Data, requestParsed->Data);
+    ASSERT_ARE_EQUAL(request->Flags, requestParsed->Flags);
 }
 
 static void TestEncodeParseResponse()
 {
-    auto response = std::make_shared< DmSignResponse >();
+    auto response = std::make_shared<DmSignResponse>();
 	response->Signature = { "ecdsa-25519", { 0x20, 0x21, 0x22, 0x23 } };
-    Buffer responseEncoded = DmEncodeMessage( response );
-    auto responseParsed = DmParseMessage( responseEncoded );
-    ASSERT_FALSE( std::dynamic_pointer_cast< DmSignResponse >( responseParsed ) == nullptr );
+    Buffer responseEncoded = DmEncodeMessage(response);
+    auto responseParsed = DmParseMessage(responseEncoded);
+    ASSERT_FALSE(std::dynamic_pointer_cast<DmSignResponse>(responseParsed) == nullptr);
 	ASSERT_ARE_EQUAL(response->Number, responseParsed->Number);
 	ASSERT_ARE_EQUAL(response->Signature.Algorithm, "ecdsa-25519");
-	ASSERT_ARE_EQUAL(response->Signature.SignatureBlob, Buffer({ 0x20, 0x21, 0x22, 0x23 } ));
+	ASSERT_ARE_EQUAL(response->Signature.SignatureBlob, Buffer({ 0x20, 0x21, 0x22, 0x23 }));
 }
 
 static void TestRequestResponse()
 {
-    auto request = std::make_shared< DmSignRequest >();
+    auto request = std::make_shared<DmSignRequest>();
     request->KeyBlob = { 0xba, 0xbe };
     request->Data = { 0xfe, 0xeb, 0x1e };
     request->Flags = 3434;
-    Buffer requestBuffer = DmEncodeMessage( std::dynamic_pointer_cast< DmMessage >( request ) );
-    Buffer responseBuffer = DraftMillerContext::Instance()->HandleMessage( requestBuffer );
-    auto message = DmParseMessage( responseBuffer );
-    if ( message->Number == SSH_AGENT_FAILURE )
-        throw UnitTestException( "DraftMillerContext return SSH_AGENT_FAILURE" );
-    auto response = std::dynamic_pointer_cast< DmSignResponse >( message );
-    ASSERT_FALSE( response == nullptr );
-    ASSERT_ARE_EQUAL( response->Number, SSH_AGENT_SIGN_RESPONSE );	
+    Buffer requestBuffer = DmEncodeMessage(std::dynamic_pointer_cast<DmMessage>(request));
+    Buffer responseBuffer = DraftMillerContext::Instance()->HandleMessage(requestBuffer);
+    auto message = DmParseMessage(responseBuffer);
+    if (message->Number == SSH_AGENT_FAILURE)
+        throw UnitTestException("DraftMillerContext return SSH_AGENT_FAILURE");
+    auto response = std::dynamic_pointer_cast<DmSignResponse>(message);
+    ASSERT_FALSE(response == nullptr);
+    ASSERT_ARE_EQUAL(response->Number, SSH_AGENT_SIGN_RESPONSE);	
 	ASSERT_ARE_EQUAL(response->Signature.Algorithm, "ecdsa-25519");
-    ASSERT_ARE_EQUAL( response->Signature.SignatureBlob, Buffer( { 0x00, 0x01, 0x02, 0x03, 0x04, 0xa0, 0xaf, 0xde, 0xad, 0xbe, 0xef } ) );
+    ASSERT_ARE_EQUAL(response->Signature.SignatureBlob, Buffer({ 0x00, 0x01, 0x02, 0x03, 0x04, 0xa0, 0xaf, 0xde, 0xad, 0xbe, 0xef }));
 }
 
 static void TestRealData()
 {
-    Buffer expectedSignRequest( s_realSignRequest );
-    Buffer expectedSignResponse( s_realSignResponse );
-    auto signRequest = DmParseMessage( s_realSignRequest );
+    Buffer expectedSignRequest(s_realSignRequest);
+    Buffer expectedSignResponse(s_realSignResponse);
+    auto signRequest = DmParseMessage(s_realSignRequest);
     auto signResponse = std::dynamic_pointer_cast<DmSignResponse>(DmParseMessage(s_realSignResponse));
-    ASSERT_FALSE( signRequest == nullptr );
-    ASSERT_FALSE( signResponse == nullptr );
-    Buffer signRequestEncoded = DmEncodeMessage( signRequest );
-    Buffer signResponseEncoded = DmEncodeMessage( signResponse );
-    ASSERT_ARE_EQUAL( expectedSignRequest, signRequestEncoded );
-    ASSERT_ARE_EQUAL( expectedSignResponse, signResponseEncoded );
+    ASSERT_FALSE(signRequest == nullptr);
+    ASSERT_FALSE(signResponse == nullptr);
+    Buffer signRequestEncoded = DmEncodeMessage(signRequest);
+    Buffer signResponseEncoded = DmEncodeMessage(signResponse);
+    ASSERT_ARE_EQUAL(expectedSignRequest, signRequestEncoded);
+    ASSERT_ARE_EQUAL(expectedSignResponse, signResponseEncoded);
 }
 
-int main( int argc, char** argv )
+int main(int argc, char** argv)
 {
-    RegisterConsoleLogger( LoggerDebugLevel::LEVEL_9 );
+    RegisterConsoleLogger(LoggerDebugLevel::LEVEL_9);
     bool testsAllPassed;
-    DECLARE_UNIT_TEST_SUITE( SignRequest )
-        ADD_UNIT_TEST( SignRequest, TestEncodeParseRequest );
-        ADD_UNIT_TEST( SignRequest, TestEncodeParseResponse );
-        ADD_UNIT_TEST( SignRequest, TestRequestResponse );
-        ADD_UNIT_TEST( SignRequest, TestRealData );
-    END_UNIT_TEST_SUITE( SignRequest, testsAllPassed )
+    DECLARE_UNIT_TEST_SUITE(SignRequest)
+        ADD_UNIT_TEST(SignRequest, TestEncodeParseRequest);
+        ADD_UNIT_TEST(SignRequest, TestEncodeParseResponse);
+        ADD_UNIT_TEST(SignRequest, TestRequestResponse);
+        ADD_UNIT_TEST(SignRequest, TestRealData);
+    END_UNIT_TEST_SUITE(SignRequest, testsAllPassed)
 
-    return ( testsAllPassed ? 0 : 1 );
+    return (testsAllPassed ? 0 : 1);
 }

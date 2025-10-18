@@ -1,14 +1,14 @@
 include_directories("${PROJECT_SOURCE_DIR}")
 
 add_library(common
-	Exception.h
-	Primitives.h
-	DataBuffer.cpp
-	DataBuffer.h
-	DataTypes.cpp
-	DataTypes.h
-	StringUtils.cpp
-	StringUtils.h)
+        Exception.h
+        Primitives.h
+        DataBuffer.cpp
+        DataBuffer.h
+        DataTypes.cpp
+        DataTypes.h
+        StringUtils.cpp
+        StringUtils.h)
 
 copy_headers_to_include()
 

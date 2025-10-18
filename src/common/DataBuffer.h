@@ -51,7 +51,7 @@ public:
     ~DataBuffer();
     DataBuffer& operator=(const DataBuffer& d);
 
-    explicit operator Buffer() const;
+    operator Buffer() const;
 
     void Clear();
     size_t Size() const;
